@@ -315,7 +315,7 @@ export const CardHorizontal = (cart) => {
 
         // Gửi yêu cầu POST đến backend server với đơn hàng đã được map
         axios
-          .post("https://phutungxemay.onrender.com/v1/ordercombo", order)
+          .post("https://photocopy.onrender.com/v1/ordercombo", order)
           .then((response) => {
             // Xử lý kết quả trả về từ backend (nếu cần)
             console.log("Yêu cầu POST thành công:", response.data);

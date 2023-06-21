@@ -64,7 +64,7 @@ export const CartPage = () => {
       }));
 
       const response = await axios.post(
-        "https://phutungxemay.onrender.com/v1/order",
+        "https://photocopy.onrender.com/v1/order",
         {
           customerId,
           products,

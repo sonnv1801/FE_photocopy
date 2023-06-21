@@ -17,7 +17,7 @@ const OrderPage = () => {
       const user = JSON.parse(localStorage.getItem("token"));
       const customerId = user?._id;
       const response = await axios.get(
-        `https://phutungxemay.onrender.com/v1/order/${customerId}`
+        `https://photocopy.onrender.com/v1/order/${customerId}`
       );
       setOrders(response.data);
     } catch (error) {
@@ -29,7 +29,7 @@ const OrderPage = () => {
     try {
       const user = JSON.parse(localStorage.getItem("token"));
       const response = await axios.get(
-        `https://phutungxemay.onrender.com/v1/delivery/${user?._id}/${orderId}`
+        `https://photocopy.onrender.com/v1/delivery/${user?._id}/${orderId}`
       );
       const updatedOrders = orders.map((order) => {
         if (order._id === orderId) {

@@ -1,5 +1,5 @@
 import Axios from "axios";
-const API = "https://phutungxemay.onrender.com/v1/productsupplier";
+const API = "https://photocopy.onrender.com/v1/productsupplier";
 
 export class ProductSupplierService {
   getPrdSupplierByType(type, limit) {

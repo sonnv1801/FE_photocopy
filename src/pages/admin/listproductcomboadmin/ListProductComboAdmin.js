@@ -96,7 +96,7 @@ function ListProductComboAdmin() {
     ) {
       try {
         const response = await axios.post(
-          "https://phutungxemay.onrender.com/v1/combo/",
+          "https://photocopy.onrender.com/v1/combo/",
           formData
         );
         console.log(response.data); // Combo được tạo thành công
@@ -130,7 +130,7 @@ function ListProductComboAdmin() {
   const fetchCombos = async () => {
     try {
       const response = await axios.get(
-        "https://phutungxemay.onrender.com/v1/combo"
+        "https://photocopy.onrender.com/v1/combo"
       );
       setCombos(response.data);
     } catch (error) {
@@ -141,9 +141,7 @@ function ListProductComboAdmin() {
   const handleDeleteCombo = async (comboId) => {
     try {
       // Send a DELETE request to the API to delete the combo
-      await axios.delete(
-        `https://phutungxemay.onrender.com/v1/combo/${comboId}`
-      );
+      await axios.delete(`https://photocopy.onrender.com/v1/combo/${comboId}`);
 
       // Fetch the updated list of combos after deletion
       fetchCombos();

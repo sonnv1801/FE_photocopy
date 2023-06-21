@@ -30,7 +30,7 @@ const EditProduct = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`https://phutungxemay.onrender.com/v1/product/${path}`)
+    fetch(`https://photocopy.onrender.com/v1/product/${path}`)
       .then((res) => res.json())
       .then((data) => setData(data));
   }, []);
