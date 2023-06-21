@@ -15,7 +15,7 @@ export const HomePage = () => {
         </p>
       </main>
       <footer>
-        <p>Bản quyền © 2023 Shop máy PHOTOCOPY. Nguyễn Văn Sơn.</p>
+        <p>Bản quyền © 2023 Shop máy PHOTOCOPY</p>
       </footer>
     </div>
   );
