@@ -166,8 +166,8 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <a href="#" title="Phụ tùng xe máy">
-                Phụ Tùng Xe máy <ArrowDropDownIcon />
+              <a href="#" title="Máy Photocopy">
+                Máy Photocopy <ArrowDropDownIcon />
               </a>
               <div className="sub-menu-lv2">
                 <div className="row">
@@ -182,7 +182,7 @@ const Navbar = () => {
               </div>
             </li>
             <li>
-              <a href="#" title="Phụ tùng xe máy">
+              <a href="#" title="Combo">
                 Combo <ArrowDropDownIcon />
               </a>
               <div className="sub-menu-lv2">

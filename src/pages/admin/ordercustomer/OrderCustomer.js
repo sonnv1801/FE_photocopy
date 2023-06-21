@@ -61,7 +61,7 @@ export const OrderCustomer = () => {
               <h2 style={{ fontSize: "15px", color: "green" }}>
                 Mã Đơn Hàng: {order._id}
               </h2>
-              <h3 style={{ margin: "1rem 0" }}>Sản phẩm phụ tùng:</h3>
+              <h3 style={{ margin: "1rem 0" }}>Sản phẩm Photocopy:</h3>
 
               <ul className="product-list">
                 {order.products.map((product) => (
@@ -94,7 +94,9 @@ export const OrderCustomer = () => {
                         <p>Số lượng đặt: {combo.quantityCombo}</p>
                         <p>
                           Tổng tiền:{" "}
-                          {`${numeral(combo.totalPrice).format("0,0")}đ`}{" "}
+                          {`${numeral(
+                            combo.subtotal * combo.quantityCombo
+                          ).format("0,0")}đ`}{" "}
                         </p>
                         <button
                           style={{ background: "blue" }}
