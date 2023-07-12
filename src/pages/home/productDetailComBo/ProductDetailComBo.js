@@ -6,12 +6,17 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getDetailComBo } from "../../../redux/actions/combo.action";
+import Modal from "react-bootstrap/Modal";
 import numeral from "numeral";
+import ModalBody from "react-bootstrap/ModalBody";
+import ModalHeader from "react-bootstrap/ModalHeader";
+import ModalFooter from "react-bootstrap/ModalFooter";
+import ModalTitle from "react-bootstrap/ModalTitle";
 
 export const ProductDetailComBo = () => {
   const location = useLocation();
@@ -33,7 +38,7 @@ export const ProductDetailComBo = () => {
   );
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [quantities, setQuantities] = useState([]);
-  const [selectAll, setSelectAll] = useState(true);
+  const [selectAll, setSelectAll] = useState(false);
   const [subtotal, setSubtotal] = useState(0);
 
   useEffect(() => {
@@ -48,8 +53,11 @@ export const ProductDetailComBo = () => {
 
   useEffect(() => {
     const allProductIds = productDetailComBo?.products?.map((item) => item._id);
-    setSelectedProducts(allProductIds || []);
-    setQuantities(Array(allProductIds?.length).fill(1));
+    const availableProductIds = productDetailComBo?.products
+      .filter((item) => item.quantity > 0)
+      .map((item) => item._id);
+    setSelectedProducts(availableProductIds || []);
+    setQuantities(Array(availableProductIds?.length).fill(1));
   }, [productDetailComBo]);
 
   useEffect(() => {
@@ -67,36 +75,50 @@ export const ProductDetailComBo = () => {
     setSubtotal(updatedSubtotal);
   }, [selectedProducts, quantities, productDetailComBo]);
   const handleProductSelection = (productId) => {
+    const product = productDetailComBo?.products?.find(
+      (item) => item._id === productId
+    );
+
     if (productId === "all") {
+      // Select all available products or deselect all if all are already selected
       if (selectAll) {
         setSelectedProducts([]);
         setQuantities([]);
         setSelectAll(false);
       } else {
-        const allProductIds = productDetailComBo?.products?.map(
-          (item) => item._id
-        );
-        setSelectedProducts(allProductIds);
-        setQuantities(Array(allProductIds.length).fill(1));
+        const availableProductIds = productDetailComBo?.products
+          .filter((item) => item.quantity > 0)
+          .map((item) => item._id);
+
+        setSelectedProducts(availableProductIds);
+        setQuantities(Array(availableProductIds.length).fill(1));
         setSelectAll(true);
       }
     } else {
-      const index = selectedProducts.indexOf(productId);
-      if (index === -1) {
-        setSelectedProducts((prevSelectedProducts) => [
-          ...prevSelectedProducts,
-          productId,
-        ]);
-        setQuantities((prevQuantities) => [...prevQuantities, 1]);
+      if (product?.quantity > 0) {
+        // Product is available, update the selected products and quantities
+        const index = selectedProducts.indexOf(productId);
+
+        if (index === -1) {
+          setSelectedProducts((prevSelectedProducts) => [
+            ...prevSelectedProducts,
+            productId,
+          ]);
+          setQuantities((prevQuantities) => [...prevQuantities, 1]);
+        } else {
+          const updatedSelection = selectedProducts.filter(
+            (id) => id !== productId
+          );
+          const updatedQuantities = quantities.filter((_, i) => i !== index);
+          setSelectedProducts(updatedSelection);
+          setQuantities(updatedQuantities);
+        }
+        setSelectAll(false);
       } else {
-        const updatedSelection = selectedProducts.filter(
-          (id) => id !== productId
-        );
-        const updatedQuantities = quantities.filter((_, i) => i !== index);
-        setSelectedProducts(updatedSelection);
-        setQuantities(updatedQuantities);
+        toast.error("Sản phẩm này đã hết hàng. Vui lòng chọn sản phẩm khác.", {
+          position: toast.POSITION.TOP_CENTER,
+        });
       }
-      setSelectAll(false);
     }
   };
 
@@ -123,13 +145,14 @@ export const ProductDetailComBo = () => {
         name: product?.name,
         productCode: product?.productCode,
         price: product?.price,
-        image: productDetailComBo?.image,
-        title: productDetailComBo?.title,
+        image: product?.images,
+        title: product?.name,
         total,
       };
     });
 
     const comboOrder = {
+      _id: productDetailComBo?._id, // Thêm _id của combo vào comboOrder
       quantityCombo: 1,
       image: productDetailComBo?.image,
       comboName: productDetailComBo?.title,
@@ -188,6 +211,15 @@ export const ProductDetailComBo = () => {
     });
   };
 
+  const [show, setShow] = useState(false);
+  const [selected, setSelected] = useState(null);
+
+  const handleClose = () => setShow(false);
+  const handleShow = (product) => {
+    setSelected(product);
+    setShow(true);
+  };
+
   return (
     <div className="prd-combo-container container">
       <div className="link-combo">
@@ -198,15 +230,15 @@ export const ProductDetailComBo = () => {
           <div className="title-combo">
             <h2>Tất cả sản phẩm có trong {productDetailComBo?.title}</h2>
           </div>
-          <div className="prd-bodys">
+          <div className="prd-bodys sm-prd-bodys">
             <div className="row">
-              <div className="col-3">
+              <div className="col-xl-3 col-sm-12">
                 <img
                   src={productDetailComBo?.image}
                   alt={productDetailComBo?.title}
                 />
               </div>
-              <div className="col-9">
+              <div className="col-xl-9 col-sm-12">
                 <div className="title-combos">
                   <div className="row">
                     <div className="col-2">
@@ -240,9 +272,36 @@ export const ProductDetailComBo = () => {
                     </div>
                   </div>
                 </div>
+                <div className="title-combos sm-title-combos">
+                  <div className="row">
+                    <div className="col-3">
+                      <span>
+                        <input
+                          type="checkbox"
+                          checked={
+                            selectedProducts.length ===
+                              productDetailComBo?.products?.length &&
+                            selectedProducts.length > 0
+                          }
+                          onChange={() => handleProductSelection("all")}
+                        />
+                        Chọn Tất Cả
+                      </span>
+                    </div>
+                    <div className="col-3">
+                      <span>Tên Sản phẩm</span>
+                    </div>
+                    <div className="col-3">
+                      <span>Số lượng</span>
+                    </div>
+                    <div className="col-3">
+                      <span>Tổng</span>
+                    </div>
+                  </div>
+                </div>
                 <div className="prd-combos">
                   {productDetailComBo?.products?.map((item, index) => (
-                    <div className="row" key={item._id.$oid}>
+                    <div className="row" key={item._id}>
                       <div className="col-2">
                         <span>
                           <input
@@ -254,7 +313,12 @@ export const ProductDetailComBo = () => {
                         </span>
                       </div>
                       <div className="col-2">
-                        <span>{item?.name}</span>
+                        <span
+                          onClick={() => handleShow(item)}
+                          style={{ cursor: "pointer", color: "pink" }}
+                        >
+                          {item?.name}
+                        </span>
                       </div>
                       <div className="col-2">
                         <span>{item?.productCode}</span>
@@ -298,9 +362,67 @@ export const ProductDetailComBo = () => {
                     </div>
                   ))}
                 </div>
+                <div className="prd-combos sm-prd-combos">
+                  {productDetailComBo?.products?.map((item, index) => (
+                    <div className="row" key={item._id}>
+                      <div className="col-6">
+                        <span>
+                          <input
+                            type="checkbox"
+                            checked={selectedProducts.includes(item._id)}
+                            onChange={() => handleProductSelection(item._id)}
+                          />
+                          Sản phẩm {index + 1}
+                        </span>
+                      </div>
+                      <div className="col-6">
+                        <span
+                          onClick={() => handleShow(item)}
+                          style={{ cursor: "pointer", color: "pink" }}
+                        >
+                          {item?.name}
+                        </span>
+                      </div>
+
+                      <div className="col-6">
+                        {item && (
+                          <div className="combos-quantity sm-combos-quantity">
+                            <div className="sub-combos-quantity sm-sub-combos-quantity">
+                              <IconButton
+                                aria-label="delete"
+                                size="large"
+                                className="quantityss"
+                                onClick={() => handleQuantityDecrease(index)}
+                              >
+                                <RemoveIcon />
+                              </IconButton>
+                              <span>{quantities[index]}</span>
+                              <IconButton
+                                aria-label="delete"
+                                size="large"
+                                className="quantityss"
+                                onClick={() => handleQuantityIncrease(index)}
+                              >
+                                <AddIcon />
+                              </IconButton>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      {item && item.price && quantities[index] && (
+                        <div className="col-6 sm-span-totals">
+                          <span>{`${numeral(
+                            item.price * quantities[index]
+                          ).format("0,0")}đ`}</span>
+                        </div>
+                      )}
+                      <hr style={{ margin: "1rem 0" }} />
+                    </div>
+                  ))}
+                </div>
                 <div className="row">
-                  <div className="col-6"></div>
-                  <div className="col-6">
+                  <div className="col-xl-6 col-sm-12"></div>
+                  <div className="col-xl-6 col-sm-12">
                     <div className="total-combos">
                       <div className="payments-moneys">
                         <b>Tạm tính</b>
@@ -333,6 +455,112 @@ export const ProductDetailComBo = () => {
           </div>
         </div>
       </div>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton style={{ background: "#034063" }}>
+          <Modal.Title>{selected?.name}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selected && (
+            <>
+              <img
+                style={{ width: "100%" }}
+                src={selected.images}
+                alt={selected?.name}
+                className="modal-image"
+              />
+              <div className="row">
+                <div className="col-6">
+                  <div
+                    className="modal-info mt-3 mb-3"
+                    style={{
+                      color: "#034063",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    <span>Mã Sản Phẩm:</span>
+                    <p style={{ color: "blue", fontWeight: "500" }}>
+                      {selected.productCode}
+                    </p>
+                  </div>
+                </div>
+                <div className="col-6">
+                  <div
+                    className="modal-info mt-3 mb-3"
+                    style={{
+                      color: "#034063",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    <span>Giá Mới:</span>{" "}
+                    <p style={{ color: "blue", fontWeight: "500" }}>
+                      {selected.price}
+                    </p>
+                  </div>
+                </div>
+                <div className="col-6">
+                  <div
+                    className="modal-info mt-3 mb-3"
+                    style={{
+                      color: "#034063",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    <span>Giá Cũ:</span>{" "}
+                    <p style={{ color: "blue", fontWeight: "500" }}>
+                      {selected.oldPrice}
+                    </p>
+                  </div>
+                </div>
+                <div className="col-6">
+                  <div
+                    className="modal-info mt-3 mb-3"
+                    style={{
+                      color: "#034063",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    <span>Số lượng Còn:</span>
+                    <p style={{ color: "blue", fontWeight: "500" }}>
+                      {selected.quantity}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="col-6">
+                  <div
+                    className="modal-info mt-3 mb-3"
+                    style={{
+                      color: "#034063",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    <span>Trạng Thái:</span>{" "}
+                    <p style={{ color: "blue", fontWeight: "500" }}>
+                      {selected.status}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Add more information here */}
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            style={{ background: "#034063", color: "white" }}
+            variant="secondary"
+            onClick={handleClose}
+          >
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

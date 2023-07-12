@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getDetailSuppliers } from "../../../redux/actions/productSupplier.action";
 import { useLocation, useNavigate } from "react-router-dom";
 import numeral from "numeral";
+
 export const ProductDetailSupplier = () => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -31,8 +32,7 @@ export const ProductDetailSupplier = () => {
   const [quantity, setQuantity] = useState(0);
 
   // Function to handle adding the product to localStorage
-  // Function to handle adding the product to localStorage
-  const handleAddToCart = () => {
+  const handleAddToCart = (purchaseType) => {
     if (quantity <= 0) {
       // Quantity not entered or is 0, do not add to cart
       return;
@@ -47,10 +47,11 @@ export const ProductDetailSupplier = () => {
       cart = JSON.parse(existingCartData);
     }
 
-    // Create the product object with code and quantity
+    // Create the product object with code, quantity, and purchaseType
     const product = {
       productCode: productDetailSupplier?.productCode,
       quantity: quantity,
+      purchaseType: purchaseType,
     };
 
     // Add the product to the cart
@@ -79,15 +80,16 @@ export const ProductDetailSupplier = () => {
         <CustomizedBreadcrumbs name={productDetailSupplier?.name} />
       </div>
       <div className="body-prd-dt">
-        <div className="sub-body-prd">
+        <div className="sub-body-prd sm-sub-body-prd">
           <div className="row">
-            <div className="col-6">
+            <div className="col-xl-6 col-sm-12">
               <img
                 src={productDetailSupplier?.image}
                 alt={productDetailSupplier?.name}
+                className="sm-sub-body-prd-img"
               />
             </div>
-            <div className="col-6">
+            <div className="col-xl-6 col-sm-12">
               <div className="body-ds">
                 <h2>{productDetailSupplier?.name} </h2>
               </div>
@@ -112,9 +114,15 @@ export const ProductDetailSupplier = () => {
                     )}đ`}</h6>
                   </div>
                   <div className="col-6">
-                    <span>Giá Bán Ra</span>
+                    <span>Giá Vốn Thường</span>
                     <h6>{`${numeral(
                       productDetailSupplier?.wholesalePrice
+                    ).format("0,0")}đ`}</h6>
+                  </div>
+                  <div className="col-6">
+                    <span>Giá Vốn Nhanh</span>
+                    <h6>{`${numeral(
+                      productDetailSupplier?.wholesalePriceQuick
                     ).format("0,0")}đ`}</h6>
                   </div>
                   <div className="col-6">
@@ -128,16 +136,7 @@ export const ProductDetailSupplier = () => {
                 <FacebookOutlinedIcon />
                 <TwitterIcon />
               </div>
-              <div className="action-prd-dt">
-                {/* <div className="btn-quantity">
-                </div> */}
-                {/* <input
-                  id="quantity-supplier"
-                  type="number"
-                  placeholder="Nhập Số lượng cần mua"
-                  value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value))}
-                /> */}
+              <div className="action-prd-dt  sm-action-prd-dt">
                 <Input
                   placeholder="Nhập số lượng cần mua"
                   type="number"
@@ -148,13 +147,22 @@ export const ProductDetailSupplier = () => {
               </div>
               <div className="action-prd-dt-btn">
                 {quantity > 0 && (
-                  <Button
-                    variant="outlined"
-                    endIcon={<ArrowRightIcon />}
-                    onClick={handleAddToCart}
-                  >
-                    Thêm vào giỏ
-                  </Button>
+                  <>
+                    <Button
+                      variant="outlined"
+                      endIcon={<ArrowRightIcon />}
+                      onClick={() => handleAddToCart("regular")}
+                    >
+                      Mua Thường
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      endIcon={<ArrowRightIcon />}
+                      onClick={() => handleAddToCart("quick")}
+                    >
+                      Mua Nhanh
+                    </Button>
+                  </>
                 )}
               </div>
               <div className="policy-prd">
@@ -182,10 +190,10 @@ export const ProductDetailSupplier = () => {
               <div className="tag-prd">
                 <b>TAG</b>
                 <div className="row mt-3">
-                  <div className="col-4">
+                  <div className="col-xl-4 col-sm-6">
                     <Tag />
                   </div>
-                  <div className="col-4">
+                  <div className="col-xl-4 col-sm-6">
                     <Tag />
                   </div>
                 </div>

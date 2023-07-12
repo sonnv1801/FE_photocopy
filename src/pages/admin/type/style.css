@@ -63,17 +63,17 @@
   font-size: 20px;
 }
 
-.modal-content .modal-body .formgroup-body input {
+/* .modal-content .modal-body .formgroup-body input {
   margin: 0;
   width: 85%;
   margin-left: 30px;
-}
+} */
 
-.modal-content .modal-body input {
+/* .modal-content .modal-body input {
   margin: 0;
   margin-left: 30px;
   width: 85%;
-}
+} */
 
 .modal-content .modal-body .formgroup-body .form-label {
   margin-top: 5px;

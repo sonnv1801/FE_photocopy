@@ -11,6 +11,7 @@ export const CartPage = () => {
   const [cartData, setCartData] = useState([]);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("token"));
+
   useEffect(() => {
     // Get the cart data from localStorage
     const existingCartData = localStorage.getItem("cart");
@@ -61,6 +62,7 @@ export const CartPage = () => {
       const products = cartData.map((product) => ({
         productCode: product.productCode,
         quantity: product.quantity,
+        purchaseType: product.purchaseType, // Thêm purchaseType vào dữ liệu sản phẩm
       }));
 
       const response = await axios.post(
@@ -84,17 +86,17 @@ export const CartPage = () => {
       console.error(error);
     }
   };
+
   const orderCount = cartData.length;
 
   return (
     <div className="cart-page">
       <h1>
         Đơn Hàng Của Bạn
-        <Link to="/">
+        <Link to="/admin">
           <Button
             variant="outlined"
             endIcon={<ArrowRightIcon />}
-            // onClick={handlePurchase}
             style={{ margin: "0", marginLeft: "1rem" }}
           >
             Tiếp tục mua hàng

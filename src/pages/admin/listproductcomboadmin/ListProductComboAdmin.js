@@ -6,28 +6,21 @@ import ModalHeader from "react-bootstrap/ModalHeader";
 import ModalFooter from "react-bootstrap/ModalFooter";
 import ModalTitle from "react-bootstrap/ModalTitle";
 import Form from "react-bootstrap/Form";
-import CloseIcon from "@mui/icons-material/Close";
-import Swal from "sweetalert2";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./style.css";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Link } from "react-router-dom";
-import {
-  addProduct,
-  deleteProduct,
-  getProducts,
-} from "../../../redux/actions/product.action";
 import { getAllTypeProductCombo } from "../../../redux/actions/typecombo.action";
 import axios from "axios";
 import Menu from "../menu/Menu";
+
 function ListProductComboAdmin() {
   const [showadd, setShowadd] = useState(false);
-  const currentUser = JSON.parse(localStorage.getItem("token"));
   const isLoading = useSelector((state) => state.defaultReducer.isLoading);
   const [expandedComboIds, setExpandedComboIds] = useState([]);
-
+  const [isCreatingProduct, setIsCreatingProduct] = useState(false);
   const handleCloseAdd = () => {
     setShowadd(false);
   };
@@ -43,81 +36,191 @@ function ListProductComboAdmin() {
 
   const [formData, setFormData] = useState({
     image: "",
+    link: "",
     title: "",
     type: "",
-    link: "",
     status: "",
-    products: [{}],
+    quantity: Number,
+    products: [
+      {
+        image: "",
+        name: "",
+        productCode: "",
+        price: Number,
+        oldPrice: Number,
+        status: "",
+        quantity: Number,
+        remainingQuantity: Number,
+      },
+    ],
   });
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const [selectedImage, setSelectedImage] = useState(null);
+  const handleInputChange = (image) => (e) => {
+    if (image === "image") {
+      const file = e.target.files[0];
+      setFormData((prevData) => ({ ...prevData, [image]: file }));
+    } else {
+      const value = e.target.value;
+      setFormData((prevData) => ({ ...prevData, [image]: value }));
+    }
   };
 
-  const handleProductChange = (index, field, value) => {
-    const updatedProducts = [...formData.products];
-    const updatedProduct = { ...updatedProducts[index] };
-    updatedProduct[field] = value === "" ? "" : value;
-    updatedProducts[index] = updatedProduct;
-    setFormData({ ...formData, products: updatedProducts });
+  const handleProductChange = (index, field) => (e) => {
+    if (field === "images") {
+      const file = e.target.files[0];
+      handleImageUpload(index, file);
+    } else {
+      const value =
+        field === "price" ? parseFloat(e.target.value) : e.target.value;
+      const updatedProducts = [...formData.products];
+      updatedProducts[index][field] = value;
+      setFormData((prevData) => ({ ...prevData, products: updatedProducts }));
+
+      const newPrice = updatedProducts.reduce(
+        (sum, product) => sum + (parseFloat(product.price) || 0),
+        0
+      );
+      setFormData((prevData) => ({ ...prevData, newPrice: newPrice }));
+    }
+  };
+
+  const handleImageUpload = (index, file) => {
+    if (file) {
+      const updatedProducts = [...formData.products];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updatedProducts[index].images = reader.result;
+        setFormData((prevData) => ({
+          ...prevData,
+          products: updatedProducts,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleAddProduct = () => {
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       products: [
-        ...formData.products,
+        ...prevData.products,
         {
-          name: "",
-          productCode: "",
-          price: 0,
-          oldPrice: 0,
-          status: "",
-          quantity: 0,
-          remainingQuantity: 0,
+          images: null,
+          name: null,
+          productCode: null,
+          price: Number,
+          oldPrice: Number,
+          status: null,
+          quantity: Number,
+          remainingQuantity: Number,
         },
       ],
-    });
+    }));
     fetchCombos();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.products.length === 0) {
+
+    const { image, products, title, type, status, quantity, link } = formData;
+
+    if (!image || !title || !type || !status || !quantity || !link) {
+      toast.warn("Vui lòng nhập đầy đủ thông tin combo.");
+      return;
+    }
+
+    if (products.length === 0) {
       toast.warn("Vui lòng nhập ít nhất 1 sản phẩm trong combo.");
       return;
     }
-    if (
-      formData.image !== "" &&
-      formData.title !== "" &&
-      formData.link !== "" &&
-      formData.status !== "" &&
-      formData.title !== ""
-    ) {
-      try {
-        const response = await axios.post(
-          "https://photocopy.onrender.com/v1/combo/",
-          formData
-        );
-        console.log(response.data); // Combo được tạo thành công
-        // Thực hiện các hành động khác sau khi tạo combo thành công
-        fetchCombos();
-        // Reset form
-        setFormData({
-          image: "",
-          title: "",
-          type: "",
-          link: "",
-          status: "",
-          products: [],
-        });
-        toast.success("Thêm thành công sản phẩm");
-        handleCloseAdd();
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
-      toast.warn("Nhập đầy đủ thông tin sản phẩm");
+
+    const hasEmptyProduct = products.some(
+      (product) =>
+        !product.images ||
+        !product.name ||
+        !product.productCode ||
+        !product.price ||
+        !product.oldPrice ||
+        !product.status ||
+        !product.quantity ||
+        !product.remainingQuantity
+    );
+
+    if (hasEmptyProduct) {
+      toast.warn(
+        "Vui lòng nhập đầy đủ thông tin cho các sản phẩm trong combo."
+      );
+      return;
+    }
+
+    setIsCreatingProduct(true); // Bắt đầu quá trình tạo sản phẩm
+
+    const comboFormData = new FormData();
+    comboFormData.append("image", image);
+    comboFormData.append("link", link);
+    comboFormData.append("title", title);
+    comboFormData.append("type", type);
+    comboFormData.append("status", status);
+    comboFormData.append("quantity", quantity);
+
+    products?.forEach((product, index) => {
+      comboFormData.append(`products[${index}][name]`, product.name);
+      comboFormData.append(
+        `products[${index}][productCode]`,
+        product.productCode
+      );
+      comboFormData.append(`products[${index}][price]`, product.price);
+      comboFormData.append(`products[${index}][oldPrice]`, product.oldPrice);
+      comboFormData.append(`products[${index}][status]`, product.status);
+      comboFormData.append(`products[${index}][quantity]`, product.quantity);
+      comboFormData.append(
+        `products[${index}][remainingQuantity]`,
+        product.remainingQuantity
+      );
+      const productImage = product.images;
+      comboFormData.append(`products[${index}][images]`, productImage);
+    });
+
+    try {
+      const comboResponse = await axios.post(
+        "https://photocopy.onrender.com/v1/combo/create",
+        comboFormData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      toast.success("Thêm mới combo thành công.");
+      setShowadd(false);
+      setFormData({
+        image: "",
+        title: "",
+        type: "",
+        status: "",
+        quantity: "",
+        products: [
+          {
+            images: "",
+            name: "",
+            productCode: "",
+            price: Number,
+            oldPrice: Number,
+            status: "",
+            quantity: Number,
+            remainingQuantity: Number,
+          },
+        ],
+      });
+      setSelectedImage(null);
+      fetchCombos();
+    } catch (error) {
+      console.log(error);
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại sau.");
+    } finally {
+      setIsCreatingProduct(false); // Kết thúc quá trình tạo sản phẩm
     }
   };
 
@@ -140,27 +243,37 @@ function ListProductComboAdmin() {
 
   const handleDeleteCombo = async (comboId) => {
     try {
-      // Send a DELETE request to the API to delete the combo
       await axios.delete(`https://photocopy.onrender.com/v1/combo/${comboId}`);
 
-      // Fetch the updated list of combos after deletion
       fetchCombos();
 
-      // Show a success notification to the user
       toast.success("Xóa Thành Công Combo");
     } catch (error) {
       console.error("Error deleting combo:", error);
-      // Show an error notification to the user
       toast.error("Xóa Thất Bại Combo");
     }
   };
+
+  useEffect(() => {
+    const selectedSupplier = listTypeComBos.find(
+      (supplier) =>
+        supplier.name.trim().toLowerCase() ===
+        formData.type.trim().toLowerCase()
+    );
+    if (selectedSupplier) {
+      setFormData((prevData) => ({
+        ...prevData,
+        link: selectedSupplier._id,
+      }));
+    }
+  }, [formData.type, listTypeComBos]);
   return (
     <div className="container-listproductAd">
       <div className="row">
-        <div className="col-3">
+        <div className="col-3 menu-admin-dt">
           <Menu />
         </div>
-        <div className="col-9">
+        <div className="col-xl-9 col-sm-12">
           <div className="title-list">
             <div className="row">
               <div className="col-sm-5">
@@ -180,141 +293,146 @@ function ListProductComboAdmin() {
               </div>
             </div>
           </div>
-          <table className="table">
-            <thead classNane="table-dark">
-              <tr>
-                <th>STT</th>
-                <th>Ảnh</th>
-                <th>Tên Sản phẩm</th>
-                <th>Mặt hàng</th>
-                <th>Giá</th>
-                <th>Sửa</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <div
-                  className="spinner-border"
-                  role="status"
-                  style={{ margin: "0 auto" }}
-                >
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <>
-                  {combos?.map((combo, index) => (
-                    <React.Fragment key={index}>
-                      <tr>
-                        {/* Render other combo data */}
-                        <td>{index}</td>
-                        <td>
-                          <img src={combo.image} alt={combo.title} />
-                        </td>
-                        <td>{combo.title}</td>
-                        <td>{combo.type}</td>
-                        <td>
-                          <p>{`${combo.newPrice.toLocaleString()}đ`}</p>
-                        </td>
-                        <td>
-                          <Link to={`/list-products-admin/${combo._id}`}>
-                            <button className="btn btn-success">
-                              <i className="fa fa-edit"></i>
-                            </button>
-                          </Link>
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => handleDeleteCombo(combo._id)}
-                          >
-                            <i className="fa fa-trash"></i>
-                          </button>
-                          {/* Check if the combo is expanded */}
-                          {expandedComboIds.includes(combo._id) ? (
+
+          <div class="table_responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Ảnh</th>
+                  <th>Tên Sản phẩm</th>
+                  <th>Mặt hàng</th>
+                  <th>Giá</th>
+                  <th>Số lượng Combo</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  <div
+                    className="spinner-border"
+                    role="status"
+                    style={{ margin: "0 auto" }}
+                  >
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                ) : (
+                  <>
+                    {combos?.map((combo, index) => (
+                      <>
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>
+                            <img src={combo.image} alt={combo.title} />
+                          </td>
+                          <td>{combo.title}</td>
+                          <td>{combo.type}</td>
+                          <td>
+                            <p>{`${combo.newPrice?.toLocaleString()}đ`}</p>
+                          </td>
+                          <td>{combo.quantity}</td>
+                          <td>
+                            <Link to={`/edit-combos/${combo._id}`}>
+                              <button className="btn btn-success">
+                                <i className="fa fa-edit"></i>
+                              </button>
+                            </Link>
                             <button
-                              className="btn btn-primary"
-                              onClick={() => {
-                                // Remove the combo ID from the expanded list
-                                setExpandedComboIds(
-                                  expandedComboIds.filter(
-                                    (id) => id !== combo._id
-                                  )
-                                );
-                              }}
+                              className="btn btn-danger"
+                              onClick={() => handleDeleteCombo(combo._id)}
                             >
-                              Ẩn
+                              <i className="fa fa-trash"></i>
                             </button>
-                          ) : (
-                            <button
-                              className="btn btn-primary"
-                              onClick={() => {
-                                // Add the combo ID to the expanded list
-                                setExpandedComboIds([
-                                  ...expandedComboIds,
-                                  combo._id,
-                                ]);
-                              }}
-                            >
-                              Xem thêm
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                      {/* Render products if the combo is expanded */}
-                      {expandedComboIds.includes(combo._id) && (
-                        <tr>
-                          <td colSpan="6">
-                            <h4>
-                              Danh sách sản phẩm: <b>{combo.title}</b>
-                            </h4>
-                            <ul>
-                              <div id="prducts-combos-title">
-                                <div className="row">
-                                  <div className="col-2">#</div>
-                                  <div className="col-2">Tên sản phẩm</div>
-                                  <div className="col-2">Mã sản phẩm</div>
-                                  <div className="col-2">Giá mới</div>
-                                  <div className="col-2">Giá cũ</div>
-                                  <div className="col-2">
-                                    Số lượng trong kho
-                                  </div>
-                                </div>
-                              </div>
-                              {combo.products.map((product, productIndex) => (
-                                <div id="prducts-combos">
-                                  <div className="row">
-                                    <div className="col-2">
-                                      {productIndex + 1}
-                                    </div>
-                                    <div className="col-2">{product.name}</div>
-                                    <div className="col-2">
-                                      {product.productCode}
-                                    </div>
-                                    <div className="col-2">{`${product.price.toLocaleString()}đ`}</div>
-                                    <div className="col-2">
-                                      {`${product.oldPrice.toLocaleString()}đ`}
-                                    </div>
-                                    <div className="col-2">
-                                      {product.remainingQuantity +
-                                        product.quantity}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </ul>
+                            {/* Check if the combo is expanded */}
+                            {expandedComboIds.includes(combo._id) ? (
+                              <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                  // Remove the combo ID from the expanded list
+                                  setExpandedComboIds(
+                                    expandedComboIds.filter(
+                                      (id) => id !== combo._id
+                                    )
+                                  );
+                                }}
+                              >
+                                Ẩn
+                              </button>
+                            ) : (
+                              <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                  // Add the combo ID to the expanded list
+                                  setExpandedComboIds([
+                                    ...expandedComboIds,
+                                    combo._id,
+                                  ]);
+                                }}
+                              >
+                                Xem thêm
+                              </button>
+                            )}
                           </td>
                         </tr>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </>
-              )}
-            </tbody>
-          </table>
+                        {expandedComboIds.includes(combo._id) && (
+                          <tr>
+                            <td colSpan="6">
+                              <ul>
+                                <div class="table_responsive">
+                                  <table>
+                                    <thead>
+                                      <tr>
+                                        <th>STT</th>
+                                        <th>Ảnh</th>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Mã sản phẩm</th>
+                                        <th>Giá mới</th>
+                                        <th>Giá cũ</th>
+                                        <th>Số lượng trong kho</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {combo.products.map(
+                                        (product, productIndex) => (
+                                          <tr>
+                                            <td>{productIndex + 1}</td>
+                                            <td>
+                                              <img
+                                                src={product.images}
+                                                alt={product.name}
+                                              />
+                                            </td>
+                                            <td>{product.name}</td>
+                                            <td> {product.productCode}</td>
+                                            <td>{`${product.price?.toLocaleString()}đ`}</td>
+                                            <td>
+                                              {" "}
+                                              {`${product.oldPrice?.toLocaleString()}đ`}
+                                            </td>
+                                            <td> {product.quantity}</td>
+                                          </tr>
+                                        )
+                                      )}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </ul>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    ))}
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       <Modal show={showadd} onHide={handleCloseAdd} className="modal">
         <ModalHeader>
-          <ModalTitle>Thêm sản phẩm</ModalTitle>
+          <ModalTitle>Thêm Combo sản phẩm</ModalTitle>
         </ModalHeader>
         <ModalBody className="modal-body">
           <Form.Group className="formgroup-body">
@@ -324,54 +442,62 @@ function ListProductComboAdmin() {
               id="title"
               name="title"
               placeholder="Nhập tên combo..."
-              // value={formData.title}
-              onChange={handleInputChange}
+              value={formData.title}
+              onChange={handleInputChange("title")}
             />
+
             <Form.Label htmlFor="type">Loại sản phẩm: </Form.Label>
             <Form.Select
               id="type"
               name="type"
               aria-label="Default select example"
-              // value={formData.type}
-              onChange={handleInputChange}
+              value={formData.type}
+              onChange={handleInputChange("type")}
             >
               <option>Chọn loại sản phẩm</option>
               {listTypeComBos?.map((item, index) => (
                 <option value={item?.name}>{item.name}</option>
               ))}
             </Form.Select>
-            <Form.Label htmlFor="link">Link sản phẩm: </Form.Label>
-            <Form.Select
-              aria-label="Default select example"
-              // value={formData.link}
-              id="link"
-              name="link"
-              onChange={handleInputChange}
-            >
-              <option>Chọn Link</option>
-              {listTypeComBos?.map((item, index) => (
-                <option value={item?.link}>{item.link}</option>
-              ))}
-            </Form.Select>
           </Form.Group>
           <Form.Label htmlFor="image">Hình ảnh: </Form.Label>
           <Form.Control
-            type="text"
+            type="file"
             size="sm"
+            placeholder="Hình ảnh combo Sản Phẩm..."
             accept="image/*"
             name="image"
-            value={formData.image}
-            onChange={handleInputChange}
+            onChange={handleInputChange("image")}
           />
-          <Form.Label htmlFor="status">Trạng thái: </Form.Label>
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Selected"
+              style={{ width: "40%", padding: "1rem", margin: "0 auto" }}
+            />
+          )}
+          <Form.Label htmlFor="quantity">Số lượng Combo: </Form.Label>
           <Form.Control
-            type="text"
-            id="status"
-            name="status"
-            placeholder="Nhập trạng thái..."
-            // value={formData.status}
-            onChange={handleInputChange}
+            type="number"
+            id="quantity"
+            name="quantity"
+            placeholder="Nhập Số lượng Combo..."
+            value={formData.quantity}
+            onChange={handleInputChange("quantity")}
           />
+
+          <Form.Label htmlFor="status">Trạng thái:</Form.Label>
+          <Form.Select
+            id="type"
+            aria-label="Default select example"
+            name="status"
+            value={formData.status}
+            onChange={handleInputChange("status")}
+          >
+            <option value="">Chọn trạng thái</option>
+            <option value="Còn Hàng">Còn Hàng</option>
+            <option value="Hết Hàng">Hết Hàng</option>
+          </Form.Select>
         </ModalBody>
         <ModalHeader>
           <ModalTitle>Thêm sản phẩm</ModalTitle>
@@ -383,116 +509,96 @@ function ListProductComboAdmin() {
               <div className="row">
                 <div className="col-6">
                   <Form.Label htmlFor={`name-${index}`}>
-                    Tên Sản Phẩm:{" "}
+                    Tên Sản Phẩm:
                   </Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Nhập tên sản phẩm..."
                     id={`name-${index}`}
                     // value={product.name}
-                    onChange={(e) =>
-                      handleProductChange(index, "name", e.target.value)
-                    }
+                    onChange={handleProductChange(index, "name")}
+                  />
+                  <Form.Label htmlFor={`image-${index}`}>Hình Ảnh:</Form.Label>
+                  <Form.Control
+                    type="file"
+                    accept="image/*"
+                    name="images"
+                    onChange={handleProductChange(index, "images")}
                   />
                 </div>
                 <div className="col-6">
                   <Form.Label htmlFor={`productCode-${index}`}>
-                    Mã sản phẩm:{" "}
+                    Mã sản phẩm:
                   </Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Nhập mã sản phẩm..."
                     id={`productCode-${index}`}
-                    // value={product.productCode}
-                    onChange={(e) =>
-                      handleProductChange(index, "productCode", e.target.value)
-                    }
+                    value={product.productCode}
+                    onChange={handleProductChange(index, "productCode")}
                   />
                 </div>
                 <div className="col-6">
                   <Form.Label htmlFor={`price-${index}`}>
-                    Giá mới sản phẩm:{" "}
+                    Giá mới sản phẩm:
                   </Form.Label>
                   <Form.Control
                     type="number"
                     placeholder="Nhập giá mới sản phẩm..."
                     id={`price-${index}`}
-                    // value={product.price}
-                    onChange={(e) =>
-                      handleProductChange(
-                        index,
-                        "price",
-                        Number(e.target.value)
-                      )
-                    }
+                    value={product.price}
+                    onChange={handleProductChange(index, "price")}
                   />
                 </div>
                 <div className="col-6">
                   <Form.Label htmlFor={`oldPrice-${index}`}>
-                    Giá cũ sản phẩm:{" "}
+                    Giá cũ sản phẩm:
                   </Form.Label>
                   <Form.Control
                     type="number"
                     placeholder="Nhập giá cũ sản phẩm..."
                     id={`oldPrice-${index}`}
-                    // value={product.oldPrice}
-                    onChange={(e) =>
-                      handleProductChange(
-                        index,
-                        "oldPrice",
-                        Number(e.target.value)
-                      )
-                    }
+                    value={product.oldPrice}
+                    onChange={handleProductChange(index, "oldPrice")}
                   />
                 </div>
                 <div className="col-6">
                   <Form.Label htmlFor={`status-${index}`}>
-                    Trạng Thái sản phẩm:{" "}
+                    Trạng Thái sản phẩm:
                   </Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Nhập trạnh thái sản phẩm..."
+                  <Form.Select
+                    aria-label="Default select example"
                     id={`status-${index}`}
-                    // value={product.status}
-                    onChange={(e) =>
-                      handleProductChange(index, "status", e.target.value)
-                    }
-                  />
+                    value={product.status}
+                    onChange={handleProductChange(index, "status")}
+                  >
+                    <option value="">Chọn trạng thái</option>
+                    <option value="Còn Hàng">Còn Hàng</option>
+                    <option value="Hết Hàng">Hết Hàng</option>
+                  </Form.Select>
                 </div>
                 <div className="col-6">
                   <Form.Label htmlFor={`quantity-${index}`}>
-                    Số lượng:{" "}
+                    Số lượng:
                   </Form.Label>
                   <Form.Control
                     type="number"
                     placeholder="Nhập số lượng sản phẩm..."
                     id={`quantity-${index}`}
-                    // value={product.quantity}
-                    onChange={(e) =>
-                      handleProductChange(
-                        index,
-                        "quantity",
-                        Number(e.target.value)
-                      )
-                    }
+                    value={product.quantity}
+                    onChange={handleProductChange(index, "quantity")}
                   />
                 </div>
                 <div className="col-6">
                   <Form.Label htmlFor={`remainingQuantity-${index}`}>
-                    Tồn Kho:{" "}
+                    Tồn Kho:
                   </Form.Label>
                   <Form.Control
                     type="number"
                     placeholder="Nhập số lượng tồn kho sản phẩm..."
                     id={`remainingQuantity-${index}`}
-                    // value={product.remainingQuantity}
-                    onChange={(e) =>
-                      handleProductChange(
-                        index,
-                        "remainingQuantity",
-                        Number(e.target.value)
-                      )
-                    }
+                    value={product.remainingQuantity}
+                    onChange={handleProductChange(index, "remainingQuantity")}
                   />
                 </div>
                 <div className="col-6"></div>
@@ -501,11 +607,21 @@ function ListProductComboAdmin() {
           </ModalBody>
         ))}
         <ModalFooter>
-          <Button variant="primary" onClick={handleAddProduct}>
+          <Button
+            variant="primary"
+            style={{ background: "#0d6efd" }}
+            onClick={handleAddProduct}
+          >
             Thêm Sản Phẩm
           </Button>
-          <Button variant="success" onClick={handleSubmit}>
-            Tạo Sản Phẩm
+          <Button
+            disabled={isCreatingProduct}
+            variant="success"
+            style={{ background: "#198754" }}
+            onClick={handleSubmit}
+            encType="multipart/form-data"
+          >
+            {isCreatingProduct ? "Vui lòng chờ..." : "Tạo sản phẩm"}
           </Button>
         </ModalFooter>
       </Modal>

@@ -1,7 +1,7 @@
 import { createAction } from ".";
 import { userService } from "../../services";
 import { LOGIN_FAILED, LOGIN_START, LOGIN_SUCCESS } from "../type/types";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export const loginStart = () => {

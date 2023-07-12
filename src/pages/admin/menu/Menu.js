@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -25,9 +25,11 @@ import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { useDispatch, useSelector } from "react-redux";
+import { getSupplier } from "../../../redux/actions/supplier.action";
 export default function Menu() {
   const [open, setOpen] = React.useState({});
-
+  const dispatch = useDispatch();
   const handleClick = (item) => {
     setOpen((prevOpen) => ({
       ...prevOpen,
@@ -36,6 +38,10 @@ export default function Menu() {
   };
 
   const user = JSON.parse(localStorage.getItem("token"));
+
+  useEffect(() => {
+    dispatch(getSupplier());
+  }, []);
   const navigate = useNavigate();
   const handlelogout = () => {
     localStorage.removeItem("token");
@@ -45,140 +51,228 @@ export default function Menu() {
     });
   };
 
-  return (
-    <List
-      sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
-      component="nav"
-      aria-labelledby="nested-list-subheader"
-      subheader={
-        <ListSubheader component="div" id="nested-list-subheader">
-          Admin
-        </ListSubheader>
-      }
-    >
-      <ListItemButton onClick={() => handleClick("phu-tung")}>
-        <ListItemIcon>
-          <AgricultureIcon />
-        </ListItemIcon>
-        <ListItemText primary="Quản Lý Photocopy" />
-        {open["phu-tung"] ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton>
-      <Collapse in={open["phu-tung"]} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <Link to="/list-types">
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <AnimationIcon />
-              </ListItemIcon>
-              <ListItemText primary="Loại Photocopy" />
-            </ListItemButton>
-          </Link>
-          <Link to="/list-products-admin">
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <DnsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Sản Phẩm Photocopy" />
-            </ListItemButton>
-          </Link>
-        </List>
-      </Collapse>
-      <ListItemButton onClick={() => handleClick("combo")}>
-        <ListItemIcon>
-          <UpcomingIcon />
-        </ListItemIcon>
-        <ListItemText primary="Quản Lý ComBo" />
-        {open["combo"] ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton>
-      <Collapse in={open["combo"]} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <Link to="/list-combos">
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <AnimationIcon />
-              </ListItemIcon>
-              <ListItemText primary="Loại Combo" />
-            </ListItemButton>
-          </Link>
-          <Link to="/list-products-combos-admin">
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <DnsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Sản Phẩm Combo" />
-            </ListItemButton>
-          </Link>
-        </List>
-      </Collapse>
-      <ListItemButton onClick={() => handleClick("don-hang")}>
-        <ListItemIcon>
-          <AddReactionIcon />
-        </ListItemIcon>
-        <ListItemText primary="Quản Lý Đơn Hàng" />
-        {open["don-hang"] ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton>
-      <Collapse in={open["don-hang"]} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <Link to="/order-customer">
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <AddTaskIcon />
-              </ListItemIcon>
-              <ListItemText primary="Đơn Hàng Của Photocopy & Combo" />
-            </ListItemButton>
-          </Link>
-          {/* <Link to="/list-products-admin">
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <DnsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Sản Phẩm Photocopy" />
-            </ListItemButton>
-          </Link> */}
-        </List>
-      </Collapse>
+  const listSupplier = useSelector(
+    (state) => state.defaultReducer.listSupplier
+  );
 
-      <ListItemButton onClick={() => handleClick("nha-cung-cap")}>
-        <ListItemIcon>
-          <AirportShuttleIcon />
-        </ListItemIcon>
-        <ListItemText primary="Quản Lý Nhà Cung Cấp" />
-        {open["nha-cung-cap"] ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton>
-      <Collapse in={open["nha-cung-cap"]} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <Link to="/delivery">
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <ChecklistIcon />
-              </ListItemIcon>
-              <ListItemText primary="Đơn Hàng Của Khách" />
-            </ListItemButton>
-          </Link>
-          <Link to="/types-supplier">
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <DirectionsCarIcon />
-              </ListItemIcon>
-              <ListItemText primary="Nhà Cung Cấp" />
-            </ListItemButton>
-          </Link>
-          <Link to="/prducts-supplier">
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <DnsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Sản Phẩm Nhà Cung Cấp" />
-            </ListItemButton>
-          </Link>
-        </List>
-      </Collapse>
-      <ListItemButton onClick={handlelogout}>
-        <ListItemIcon>
-          <LogoutIcon />
-        </ListItemIcon>
-        <ListItemText primary="Đăng Xuất" />
-      </ListItemButton>
-    </List>
+  return (
+    <>
+      <List
+        id="menu-admin-dt"
+        sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+        component="nav"
+        aria-labelledby="nested-list-subheader"
+        subheader={
+          <ListSubheader component="div" id="nested-list-subheader">
+            Admin
+          </ListSubheader>
+        }
+      >
+        <ListItemButton onClick={() => handleClick("phu-tung")}>
+          <ListItemIcon>
+            <AgricultureIcon />
+          </ListItemIcon>
+          <ListItemText primary="Quản Lý Phụ Tùng" />
+          {open["phu-tung"] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open["phu-tung"]} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link to="/list-types">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <AnimationIcon />
+                </ListItemIcon>
+                <ListItemText primary="Loại Phụ Tùng" />
+              </ListItemButton>
+            </Link>
+            <Link to="/list-products-admin">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <DnsIcon />
+                </ListItemIcon>
+                <ListItemText primary="Sản Phẩm Phụ Tùng" />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton onClick={() => handleClick("combo")}>
+          <ListItemIcon>
+            <UpcomingIcon />
+          </ListItemIcon>
+          <ListItemText primary="Quản Lý ComBo" />
+          {open["combo"] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open["combo"]} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link to="/list-combos">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <AnimationIcon />
+                </ListItemIcon>
+                <ListItemText primary="Loại Combo" />
+              </ListItemButton>
+            </Link>
+            <Link to="/list-products-combos-admin">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <DnsIcon />
+                </ListItemIcon>
+                <ListItemText primary="Sản Phẩm Combo" />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton onClick={() => handleClick("don-hang")}>
+          <ListItemIcon>
+            <AddReactionIcon />
+          </ListItemIcon>
+          <ListItemText primary="Quản Lý Đơn Hàng" />
+          {open["don-hang"] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open["don-hang"]} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link to="/order-customer">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <AddTaskIcon />
+                </ListItemIcon>
+                <ListItemText primary="Đơn Hàng Của Phụ Tùng & Combo" />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+
+        <ListItemButton onClick={() => handleClick("nha-cung-cap")}>
+          <ListItemIcon>
+            <AirportShuttleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Quản Lý Nhà Cung Cấp" />
+          {open["nha-cung-cap"] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open["nha-cung-cap"]} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link to="/delivery">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ChecklistIcon />
+                </ListItemIcon>
+                <ListItemText primary="Đơn Hàng Của Khách" />
+              </ListItemButton>
+            </Link>
+            <Link to="/types-supplier">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <DirectionsCarIcon />
+                </ListItemIcon>
+                <ListItemText primary="Nhà Cung Cấp" />
+              </ListItemButton>
+            </Link>
+            <Link to="/prducts-supplier">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <DnsIcon />
+                </ListItemIcon>
+                <ListItemText primary="Sản Phẩm Nhà Cung Cấp" />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+
+        <ListItemButton onClick={() => handleClick("mua-nha-cung-cap")}>
+          <ListItemIcon>
+            <AirportShuttleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Mua Hàng Từ Nhà Cung Cấp" />
+          {open["mua-nha-cung-cap"] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open["mua-nha-cung-cap"]} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {listSupplier?.map((item, index) => (
+              <Link to={`/shopsupplier/${item._id}`}>
+                <ListItemButton sx={{ pl: 4 }}>
+                  <ListItemIcon>
+                    <ChecklistIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={item?.name} />
+                </ListItemButton>
+              </Link>
+            ))}
+          </List>
+        </Collapse>
+
+        <ListItemButton onClick={() => handleClick("quan-ly-kho-cung-cap")}>
+          <ListItemIcon>
+            <AirportShuttleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Quản Lý Đơn Hàng Cung Cấp Của Tôi" />
+          {open["quan-ly-kho-cung-cap"] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse
+          in={open["quan-ly-kho-cung-cap"]}
+          timeout="auto"
+          unmountOnExit
+        >
+          <List component="div" disablePadding>
+            <Link to="/orderpage">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ChecklistIcon />
+                </ListItemIcon>
+                <ListItemText primary="Đơn Hàng Đã Đặt" />
+              </ListItemButton>
+            </Link>
+            <Link to="/cart-supplier">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ChecklistIcon />
+                </ListItemIcon>
+                <ListItemText primary="Lên Đơn" />
+              </ListItemButton>
+            </Link>
+            <Link to="/statistics">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ChecklistIcon />
+                </ListItemIcon>
+                <ListItemText primary="Thống Kê" />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton onClick={() => handleClick("bao-tri")}>
+          <ListItemIcon>
+            <AirportShuttleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Dịch Vụ Bảo Trì" />
+          {open["bao-tri"] ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open["bao-tri"]} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <Link to="/admin-maintenance-list">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ChecklistIcon />
+                </ListItemIcon>
+                <ListItemText primary="Bảo Trì" />
+              </ListItemButton>
+            </Link>
+            <Link to="/admin-list-maintenanceSupplies">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ChecklistIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Vật Tư" />
+              </ListItemButton>
+            </Link>
+          </List>
+        </Collapse>
+        <ListItemButton onClick={handlelogout}>
+          <ListItemIcon>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText primary="Đăng Xuất" />
+        </ListItemButton>
+      </List>
+    </>
   );
 }

@@ -1,27 +1,33 @@
-import Swal from "sweetalert2";
 import {
   ADD_CART,
   ADD_PRODUCT,
   ADD_PRODUCT_SUPPLIER,
   ADD_TYPES,
   ADD_TYPES_COMBO,
+  ADD_TYPES_MAINTENANCE,
   ADD_TYPES_SUPPLIER,
   DELETE_CART,
   DELETE_PRODUCT,
   DELETE_PRODUCT_SUPPLIER,
+  DELETE_PRODUCT_TO_ORDERS,
   DELETE_TYPES,
   DELETE_TYPES_COMBO,
+  DELETE_TYPES_MAINTENANCE,
   DELETE_TYPES_SUPPLIER,
   FETCH_COMBO_BY_LINK,
   FETCH_DETAIL,
   FETCH_DETAIL_COMBO,
   FETCH_DETAIL_SUPPLIER,
   FETCH_PRODUCTS,
+  FETCH_PRODUCTS_COMBOS,
+  FETCH_PRODUCTS_TO_ORDERS,
   FETCH_PRODUCT_BY_TYPE,
+  FETCH_PRODUCT_DETAIL_TO__COMBO,
   FETCH_PRODUCT_SUPPLIER,
   FETCH_PRODUCT_SUPPLIER_BY_TYPE,
   FETCH_SUPPLIER_TYPE,
   FETCH_TYPE_COMBO_PRODUCT,
+  FETCH_TYPE_MAINTENANCE,
   FETCH_TYPE_PRODUCT,
   LOGIN_FAILED,
   LOGIN_START,
@@ -42,14 +48,18 @@ const initialState = {
     error: false,
   },
   listType: [],
+  listTypeMaintenance: [],
   listSupplier: [],
   listTypeComBo: [],
+  listProductToOrder: [],
+  listProductCombos: [],
   listProductByType: [],
   listComboByTypeLink: [],
   listProductSupplierByType: [],
   listProducts: [],
   listProductSupplier: [],
   productDetail: null,
+  productDetailToComBo: null,
   productDetailSupplier: null,
   productDetailComBo: null,
   cart: [],
@@ -86,6 +96,11 @@ const defaultReducer = (state = initialState, action) => {
       state.listType = payload;
       return { ...state }; //setState
     }
+
+    case FETCH_TYPE_MAINTENANCE: {
+      state.listTypeMaintenance = payload;
+      return { ...state }; //setState
+    }
     case FETCH_SUPPLIER_TYPE: {
       state.listSupplier = payload;
       return { ...state }; //setState
@@ -108,6 +123,10 @@ const defaultReducer = (state = initialState, action) => {
     }
     case FETCH_DETAIL: {
       state.productDetail = payload;
+      return { ...state };
+    }
+    case FETCH_PRODUCT_DETAIL_TO__COMBO: {
+      state.productDetailToComBo = payload;
       return { ...state };
     }
 
@@ -185,6 +204,13 @@ const defaultReducer = (state = initialState, action) => {
       state.listType = updateList;
       return { ...state };
     }
+
+    case ADD_TYPES_MAINTENANCE: {
+      let updateList = [...state.listTypeMaintenance];
+      updateList.push(payload);
+      state.listTypeMaintenance = updateList;
+      return { ...state };
+    }
     case DELETE_TYPES: {
       let updateList = [...state.listType];
       let index = updateList.findIndex((type) => type.id === action.id);
@@ -195,9 +221,28 @@ const defaultReducer = (state = initialState, action) => {
 
       return { ...state };
     }
+    case DELETE_TYPES_MAINTENANCE: {
+      let updateList = [...state.listTypeMaintenance];
+      let index = updateList.findIndex((type) => type.id === action.id);
+      if (index === -1) {
+        updateList.splice(payload, index);
+        state.listTypeMaintenance = updateList;
+      }
 
+      return { ...state };
+    }
     case FETCH_PRODUCTS: {
       state.listProducts = payload;
+      return { ...state }; //setState
+    }
+
+    case FETCH_PRODUCTS_COMBOS: {
+      state.listProductCombos = payload;
+      return { ...state }; //setState
+    }
+
+    case FETCH_PRODUCTS_TO_ORDERS: {
+      state.listProductToOrder = payload;
       return { ...state }; //setState
     }
     case ADD_PRODUCT: {
@@ -212,6 +257,17 @@ const defaultReducer = (state = initialState, action) => {
       if (index === -1) {
         updateList.splice(payload, index);
         state.listProducts = updateList;
+      }
+
+      return { ...state };
+    }
+
+    case DELETE_PRODUCT_TO_ORDERS: {
+      let updateList = [...state.listProductToOrder];
+      let index = updateList.findIndex((product) => product.id === action.id);
+      if (index === -1) {
+        updateList.splice(payload, index);
+        state.listProductToOrder = updateList;
       }
 
       return { ...state };

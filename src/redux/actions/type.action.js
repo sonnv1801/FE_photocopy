@@ -7,7 +7,7 @@ import {
   START_LOADING,
   STOP_LOADING,
 } from "../type/types";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
 export const startLoading = () => {

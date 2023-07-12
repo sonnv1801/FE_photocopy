@@ -6,9 +6,9 @@ import Typography from "@mui/material/Typography";
 import numeral from "numeral";
 import "./style.css";
 export default function ImgMediaCard({ item }) {
-  console.log(item, "item");
   return (
     <Card
+      className="sm-card"
       sx={{ maxWidth: 345 }}
       style={{ padding: "0", marginBottom: "1rem", borderRadius: "0.6rem" }}
     >
@@ -25,18 +25,20 @@ export default function ImgMediaCard({ item }) {
           component="div"
           className="title-prd"
         >
-          {item?.title}
+          {item?.name}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          <p className="code-product">{item?.code}</p>
+          <p className="code-product">{item?.productCode}</p>
         </Typography>
 
         <Typography variant="body2" color="text.secondary">
           <div id="priceandstatus">
-            <p className="code-product">{`${numeral(item.newPrice).format(
+            <p className="code-product">{`${numeral(item.retailPrice).format(
               "0,0"
             )}đ`}</p>
-            <span className="code-product">{item?.status}</span>
+            <span className="code-product">
+              {item?.quantityDelivered === 0 ? "Hết Hàng" : "Còn Hàng"}
+            </span>
           </div>
         </Typography>
       </CardContent>

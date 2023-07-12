@@ -9,9 +9,9 @@ import "./style.css";
 import { Link } from "react-router-dom";
 import numeral from "numeral";
 export default function CardSupplier({ item }) {
-  console.log(item, "item");
   return (
     <Card
+      className="sm-card"
       sx={{ maxWidth: 345 }}
       style={{ padding: "0", marginBottom: "1rem", borderRadius: "0.6rem" }}
     >

@@ -42,7 +42,7 @@ function TypeCombos() {
     e.preventDefault();
     const newType = {
       name: name,
-      link: link,
+      // link: link,
     };
     dispatch(addTypeCombos(newType, currentUser?.accessToken));
     setShowadd(false);
@@ -51,10 +51,10 @@ function TypeCombos() {
   return (
     <div className="container-listtypeAd">
       <div className="row">
-        <div className="col-3">
+        <div className="col-3 menu-admin-dt">
           <Menu />
         </div>
-        <div className="col-9">
+        <div className="col-xl-9 col-sm-12">
           <div className="title-list">
             <div className="row">
               <div className="col-sm-5">
@@ -74,58 +74,60 @@ function TypeCombos() {
               </div>
             </div>
           </div>
-          <table className="table">
-            <thead classNane="table-dark">
-              <tr>
-                <th>STT</th>
-                <th>Tên Mặt hàng</th>
-                <th>Xoá</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <div
-                  className="spinner-border"
-                  role="status"
-                  style={{ margin: "0 auto" }}
-                >
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              ) : (
-                <>
-                  {listTypeComBos?.map((item, index) => (
-                    <>
-                      <tr>
-                        <td>{index + 1}</td>
-                        <td>{item.name}</td>
-                        <td>
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => {
-                              dispatch(
-                                deleteTypesCombo(
-                                  item._id,
-                                  currentUser?.accessToken
-                                )
-                              );
-                            }}
-                          >
-                            <i className="fa fa-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    </>
-                  ))}
-                </>
-              )}
-            </tbody>
-          </table>
+          <div class="table_responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Tên Mặt hàng</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  <div
+                    className="spinner-border"
+                    role="status"
+                    style={{ margin: "0 auto" }}
+                  >
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                ) : (
+                  <>
+                    {listTypeComBos?.map((item, index) => (
+                      <>
+                        <tr>
+                          <td>{index + 1}</td>
+                          <td>{item.name}</td>
+                          <td>
+                            <button
+                              className="btn btn-danger"
+                              onClick={() => {
+                                dispatch(
+                                  deleteTypesCombo(
+                                    item._id,
+                                    currentUser?.accessToken
+                                  )
+                                );
+                              }}
+                            >
+                              <i className="fa fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      </>
+                    ))}
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       <Modal show={showadd} onHide={handleCloseAdd} className="modal">
         <ModalHeader>
-          <ModalTitle>Thêm Loại Photocopy</ModalTitle>
+          <ModalTitle>Thêm Loại Phụ Tùng</ModalTitle>
         </ModalHeader>
         <ModalBody className="modal-body">
           <Form.Group className="formgroup-body">
@@ -136,17 +138,21 @@ function TypeCombos() {
               onChange={(e) => setName(e.target.value)}
               placeholder="Nhập Loại..."
             />
-            <Form.Label>Đường Dẫn: </Form.Label>
+            {/* <Form.Label>Đường Dẫn: </Form.Label>
             <Form.Control
               type="text"
               // onChange={handleChange('name')}
               onChange={(e) => setLink(e.target.value)}
               placeholder="Nhập link..."
-            />
+            /> */}
           </Form.Group>
         </ModalBody>
         <ModalFooter>
-          <Button variant="success" onClick={handleSubmit}>
+          <Button
+            style={{ background: "#198754" }}
+            variant="success"
+            onClick={handleSubmit}
+          >
             Thêm Loại
           </Button>
         </ModalFooter>

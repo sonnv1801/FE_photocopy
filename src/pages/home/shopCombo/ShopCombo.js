@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { CartMini } from "../../../components/cartmini/CartMini";
 import ImgMediaCard from "../../../components/imgMediaCard/ImgMediaCard";
+import ImgMediaCardComBo from "../../../components/imgMediaCard/ImgMediaCardComBo";
 import { TitleStore } from "../../../components/titlestore/TitleStore";
 import { getComBoByTypeLink } from "../../../redux/actions/combo.action";
 import { getProductByTypes } from "../../../redux/actions/product.action";
@@ -31,14 +32,14 @@ export const ShopCombo = () => {
   useEffect(() => {
     dispatch(getComBoByTypeLink(type, 8));
   }, []);
-  console.log(listTypeComBo);
+
   return (
     <div className="shop-container container">
       <div className="category-product">
         <div className="row">
           {listTypeComBo.map((item, index) => (
-            <div className="col-2">
-              <Link to={`/shopcombo/${item.link}`} onClick={refreshPage}>
+            <div className="col-xl-2 col-sm-6">
+              <Link to={`/shopcombo/${item._id}`} onClick={refreshPage}>
                 <CartMini name={item.name} key={index} />
               </Link>
             </div>
@@ -52,9 +53,9 @@ export const ShopCombo = () => {
       <div className="products-body">
         <div className="row">
           {listComboByTypeLink.map((item, index) => (
-            <div className="col-3">
+            <div className="col-xl-3 col-sm-6">
               <Link to={`/shop/product-dt-combo/${item?._id}`}>
-                <ImgMediaCard item={item} key={index} />
+                <ImgMediaCardComBo item={item} key={index} />
               </Link>
             </div>
           ))}

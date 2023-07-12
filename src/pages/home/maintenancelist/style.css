@@ -1,0 +1,45 @@
+.maintenance-list-container {
+  margin: 20px;
+}
+
+.maintenance-list-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.maintenance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.maintenance-table th,
+.maintenance-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.maintenance-table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.maintenance-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.maintenance-table tbody tr:hover {
+  background-color: #ebebeb;
+}
+
+.maintenance-table ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.maintenance-table li {
+  margin-bottom: 5px;
+  list-style-type: auto !important;
+}
+
+/* Các tùy chỉnh CSS khác cho phần tử khác trong bảng */
