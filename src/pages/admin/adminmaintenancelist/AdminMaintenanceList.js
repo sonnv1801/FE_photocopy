@@ -18,6 +18,10 @@ const AdminMaintenanceList = () => {
   const [supplies, setSupplies] = useState("");
   const [staffOptions, setStaffOptions] = useState([]);
   const [suppliesOptions, setSuppliesOptions] = useState([]);
+  const [selectedSuppliesInfo, setSelectedSuppliesInfo] = useState(null);
+  const [selectedMaintenanceId, setSelectedMaintenanceId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   console.log(suppliesOptions, "suppliesOptions");
   useEffect(() => {
     fetchMaintenanceList();
@@ -27,20 +31,30 @@ const AdminMaintenanceList = () => {
 
   const fetchMaintenanceList = async () => {
     try {
-      const response = await axios.get(
-        "https://photocopy.onrender.com/v1/maintenance"
-      );
+      const response = await axios.get("http://localhost:8000/v1/maintenance");
       setMaintenanceList(response.data);
     } catch (error) {
       console.error(error);
     }
   };
 
+  const fetchSuppliesInfo = async (suppliesId) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        `http://localhost:8000/v1/maintenancesupplies/${suppliesId}`
+      );
+      setSelectedSuppliesInfo(response.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const fetchStaffOptions = async () => {
     try {
-      const response = await axios.get(
-        "https://photocopy.onrender.com/v1/user"
-      );
+      const response = await axios.get("http://localhost:8000/v1/user");
       const filteredOptions = response.data.filter((user) => user.role === "1");
       setStaffOptions(filteredOptions);
     } catch (error) {
@@ -51,7 +65,7 @@ const AdminMaintenanceList = () => {
   const fetchSuppliesOptions = async () => {
     try {
       const response = await axios.get(
-        "https://photocopy.onrender.com/v1/maintenanceSupplies"
+        "http://localhost:8000/v1/maintenanceSupplies"
       );
       setSuppliesOptions(response.data);
     } catch (error) {
@@ -72,7 +86,7 @@ const AdminMaintenanceList = () => {
       };
 
       const response = await axios.put(
-        `https://photocopy.onrender.com/v1/maintenance/${maintenanceId}`,
+        `http://localhost:8000/v1/maintenance/${maintenanceId}`,
         maintenanceToUpdate
       );
       console.log(response.data);
@@ -107,17 +121,15 @@ const AdminMaintenanceList = () => {
       (supplies) => supplies._id === selectedSuppliesId
     );
     if (selectedSupplies) {
-      setSupplies(selectedSupplies.name);
+      setSupplies(selectedSupplies); // Lưu thông tin vật tư đã chọn
     } else {
-      setSupplies("");
+      setSupplies(null);
     }
   };
 
   const handleDeleteMaintenance = async (maintenance) => {
     try {
-      await axios.delete(
-        `https://photocopy.onrender.com/v1/maintenance/${maintenance}`
-      );
+      await axios.delete(`http://localhost:8000/v1/maintenance/${maintenance}`);
 
       fetchMaintenanceList();
 
@@ -156,7 +168,7 @@ const AdminMaintenanceList = () => {
               <th>Địa Chỉ</th>
               <th>Ghi Chú Của Khách</th>
               <th>Nhân Viên Tiếp Nhận</th>
-              <th>Vật Tư Cấp Cho Nhân Viên</th>
+              <th>Linh Kiện Cấp Cho Nhân Viên (Số seri)</th>
               <th>Trạng Thái Sửa Máy</th>
               <th>Lịch Sử Sửa Máy</th>
               <th>Hành Động</th>
@@ -179,10 +191,37 @@ const AdminMaintenanceList = () => {
                     : maintenance.staff}
                 </td>
                 <td>
-                  {maintenance.supplies === undefined
-                    ? "Chọn Vật Tư..."
-                    : maintenance.supplies}
+                  {maintenance.supplies === undefined ? (
+                    "Chọn Vật Tư..."
+                  ) : (
+                    <>
+                      <span>Mã Vật Tư: {maintenance.supplies}</span>
+                      <button
+                        className="btn btn-success"
+                        disabled={isLoading}
+                        onClick={() => {
+                          setSelectedMaintenanceId(maintenance._id);
+                          setSelectedSuppliesId(maintenance.supplies);
+                          fetchSuppliesInfo(maintenance.supplies);
+                        }}
+                      >
+                        {isLoading ? "Vui Lòng Đợi..." : "Xem Thông Tin"}
+                      </button>
+                    </>
+                  )}
+
+                  {selectedSuppliesInfo &&
+                    selectedSuppliesId === maintenance.supplies && (
+                      <ul style={{ listStyleType: "auto", padding: "0 1rem" }}>
+                        <li>Tên Vật Tư: {selectedSuppliesInfo.name}</li>
+                        <li>Mã Seri: {selectedSuppliesInfo.seri}</li>
+                        <li>
+                          Những Linh Kiện Gồm: {selectedSuppliesInfo.note}
+                        </li>
+                      </ul>
+                    )}
                 </td>
+
                 <td>
                   {maintenance.repairStatus === "pending"
                     ? "Chờ xử lý..."

@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import DraftsIcon from "@mui/icons-material/Drafts";
-import SendIcon from "@mui/icons-material/Send";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import StarBorder from "@mui/icons-material/StarBorder";
 import { Link, useNavigate } from "react-router-dom";
 
 import AgricultureIcon from "@mui/icons-material/Agriculture";
@@ -36,8 +32,6 @@ export default function Menu() {
       [item]: !prevOpen[item],
     }));
   };
-
-  const user = JSON.parse(localStorage.getItem("token"));
 
   useEffect(() => {
     dispatch(getSupplier());
@@ -256,12 +250,36 @@ export default function Menu() {
                 <ListItemText primary="Bảo Trì" />
               </ListItemButton>
             </Link>
+            <Link to="/admin-create-staff">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ChecklistIcon />
+                </ListItemIcon>
+                <ListItemText primary="Tạo Nhân Viên" />
+              </ListItemButton>
+            </Link>
             <Link to="/admin-list-maintenanceSupplies">
               <ListItemButton sx={{ pl: 4 }}>
                 <ListItemIcon>
                   <ChecklistIcon />
                 </ListItemIcon>
-                <ListItemText primary="Quản Lý Vật Tư" />
+                <ListItemText primary="Quản Lý Linh Kiện Máy" />
+              </ListItemButton>
+            </Link>
+            <Link to="/admin-list-machinecode">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ChecklistIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Mã Máy" />
+              </ListItemButton>
+            </Link>
+            <Link to="/admin-list-machinelocation">
+              <ListItemButton sx={{ pl: 4 }}>
+                <ListItemIcon>
+                  <ChecklistIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Vị Trí Máy" />
               </ListItemButton>
             </Link>
           </List>

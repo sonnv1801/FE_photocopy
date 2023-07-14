@@ -439,11 +439,38 @@ export const NavBarMobile = ({
                         </li>
                         <li>
                           <Link
+                            to="/admin-create-staff"
+                            className="dropdown-item"
+                            onClick={refreshPage}
+                          >
+                            Tạo Nhân Viên
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
                             to="/admin-list-maintenanceSupplies"
                             className="dropdown-item"
                             onClick={refreshPage}
                           >
-                            Quản Lý Vật Tư
+                            Quản Lý Linh Kiện Máy
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/admin-list-machinecode"
+                            className="dropdown-item"
+                            onClick={refreshPage}
+                          >
+                            Quản Lý Mã Máy
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/admin-list-machinelocation"
+                            className="dropdown-item"
+                            onClick={refreshPage}
+                          >
+                            Quản Lý Vị Trí Máy
                           </Link>
                         </li>
                       </ul>

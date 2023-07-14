@@ -7,25 +7,25 @@ import ModalHeader from "react-bootstrap/ModalHeader";
 import ModalFooter from "react-bootstrap/ModalFooter";
 import ModalTitle from "react-bootstrap/ModalTitle";
 import Button from "react-bootstrap/Button";
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Form from "react-bootstrap/Form";
 
 import "./style.css";
 
 import Menu from "../menu/Menu";
-import {
-  addTypeMaintenances,
-  deleteTypeMaintenances,
-  gettypeMaintenances,
-} from "../../../redux/actions/typeMaintenance.action";
 
-function TypeMaintenanceSupplies() {
+import {
+  addCodes,
+  deleteCodes,
+  getAllCodes,
+} from "../../../redux/actions/machineCode.action";
+function MachineCodeAdmin() {
   const [showadd, setShowadd] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("token"));
   const [name, setName] = useState("");
-  const [seri, setSeri] = useState("");
-  const [note, setNote] = useState("");
+
   const isLoading = useSelector((state) => state.defaultReducer.isLoading);
 
   const dispatch = useDispatch();
@@ -34,24 +34,18 @@ function TypeMaintenanceSupplies() {
     setShowadd(false);
   };
 
-  const listTypeMaintenances = useSelector(
-    (state) => state.defaultReducer.listTypeMaintenance
-  );
-
-  console.log(listTypeMaintenances, "listTypeMaintenances");
-
+  const listCodes = useSelector((state) => state.defaultReducer.listCode);
   useEffect(() => {
-    dispatch(gettypeMaintenances());
+    dispatch(getAllCodes());
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newType = {
+
+    const newCode = {
       name: name,
-      seri: seri,
-      note: note,
     };
-    dispatch(addTypeMaintenances(newType, currentUser?.accessToken));
+    dispatch(addCodes(newCode, currentUser?.accessToken));
     setShowadd(false);
   };
 
@@ -65,7 +59,7 @@ function TypeMaintenanceSupplies() {
           <div className="title-list">
             <div className="row">
               <div className="col-sm-5">
-                <p>Linh Kiện Máy</p>
+                <p>Thêm Mã Máy</p>
               </div>
               <div className="col-sm-7">
                 <button
@@ -76,7 +70,7 @@ function TypeMaintenanceSupplies() {
                   }}
                 >
                   <i className="bx bxs-folder-plus"></i>
-                  <span>Thêm Linh Kiện</span>
+                  <span>Thêm Mã Máy</span>
                 </button>
               </div>
             </div>
@@ -86,9 +80,7 @@ function TypeMaintenanceSupplies() {
               <thead>
                 <tr>
                   <th>STT</th>
-                  <th>Tên Linh Kiện</th>
-                  <th>Mã Seri</th>
-                  <th>Ghi Chú</th>
+                  <th>Mã Máy</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -103,19 +95,17 @@ function TypeMaintenanceSupplies() {
                   </div>
                 ) : (
                   <>
-                    {listTypeMaintenances?.map((item, index) => (
+                    {listCodes?.map((item, index) => (
                       <>
                         <tr>
                           <td>{index + 1}</td>
                           <td>{item.name}</td>
-                          <td>{item.seri}</td>
-                          <td>{item.note}</td>
                           <td>
                             <button
                               className="btn btn-danger"
                               onClick={() => {
                                 dispatch(
-                                  deleteTypeMaintenances(
+                                  deleteCodes(
                                     item._id,
                                     currentUser?.accessToken
                                   )
@@ -138,27 +128,16 @@ function TypeMaintenanceSupplies() {
 
       <Modal show={showadd} onHide={handleCloseAdd} className="modal">
         <ModalHeader>
-          <ModalTitle>Thêm Mới Linh Kiện</ModalTitle>
+          <ModalTitle>Thêm Mới Mã Máy</ModalTitle>
         </ModalHeader>
         <ModalBody className="modal-body">
           <Form.Group className="formgroup-body">
-            <Form.Label>Tên Linh Kiện: </Form.Label>
+            <Form.Label>Mã Máy</Form.Label>
             <Form.Control
               type="text"
+              // onChange={handleChange('name')}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nhập Loại..."
-            />
-            <Form.Label>Mã Seri: </Form.Label>
-            <Form.Control
-              type="text"
-              onChange={(e) => setSeri(e.target.value)}
-              placeholder="Nhập mã seri..."
-            />
-            <Form.Label>Ghi Chú: </Form.Label>
-            <Form.Control
-              type="text"
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Nhập ghi chú..."
+              placeholder="Nhập Mã Máy..."
             />
           </Form.Group>
         </ModalBody>
@@ -168,7 +147,7 @@ function TypeMaintenanceSupplies() {
             variant="success"
             onClick={handleSubmit}
           >
-            Thêm Loại
+            Tạo Mã Máy
           </Button>
         </ModalFooter>
       </Modal>
@@ -176,4 +155,4 @@ function TypeMaintenanceSupplies() {
   );
 }
 
-export default TypeMaintenanceSupplies;
+export default MachineCodeAdmin;

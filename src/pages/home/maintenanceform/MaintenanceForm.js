@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./style.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import { getAllCodes } from "../../../redux/actions/machineCode.action";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllLocations } from "../../../redux/actions/machineLocation.action";
 const MaintenanceForm = () => {
   const [nameProduct, setNameProduct] = useState("");
   const [customerId, setCustomerId] = useState("");
@@ -16,7 +17,7 @@ const MaintenanceForm = () => {
   const [note, setNote] = useState("");
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("token"));
-
+  const dispatch = useDispatch();
   useEffect(() => {
     const customerData = JSON.parse(localStorage.getItem("token"));
 
@@ -28,6 +29,17 @@ const MaintenanceForm = () => {
     }
   }, []);
 
+  const listCodes = useSelector((state) => state.defaultReducer.listCode);
+  useEffect(() => {
+    dispatch(getAllCodes());
+  }, []);
+
+  const listLocations = useSelector(
+    (state) => state.defaultReducer.listLocation
+  );
+  useEffect(() => {
+    dispatch(getAllLocations());
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -57,16 +69,13 @@ const MaintenanceForm = () => {
 
     try {
       // Tiếp tục xử lý khi các trường đều đã được nhập
-      const response = await fetch(
-        "https://photocopy.onrender.com/v1/maintenance",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(maintenanceData),
-        }
-      );
+      const response = await fetch("http://localhost:8000/v1/maintenance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(maintenanceData),
+      });
 
       const data = await response.json();
 
@@ -97,32 +106,40 @@ const MaintenanceForm = () => {
             </div>
             <div class="input-box">
               <label htmlFor="machineCode">Mã Máy</label>
-              <input
-                type="text"
-                placeholder="Nhập Mã Máy Của Bạn..."
-                required
-                onChange={(e) => setMachineCode(e.target.value)}
-              />
+              <div class="select-box">
+                <select
+                  value={machineCode}
+                  onChange={(e) => setMachineCode(e.target.value)}
+                >
+                  <option hidden>Chọn Mã Máy</option>
+                  {listCodes.map((item, index) => (
+                    <option value={item.name} key={index}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
           <div class="column">
-            {/* <div class="input-box">
+            <div class="input-box">
               <label htmlFor="machineLocation">Vị Trí Máy</label>
               <div class="select-box">
                 <select
                   value={machineLocation}
                   onChange={(e) => setMachineLocation(e.target.value)}
                 >
-                  <option hidden>Country</option>
-                  <option>America</option>
-                  <option>Japan</option>
-                  <option>India</option>
-                  <option>Nepal</option>
+                  <option hidden>Chọn Vị Trí Máy</option>
+                  {listLocations.map((item, index) => (
+                    <option value={item.name} key={index}>
+                      {item.name}
+                    </option>
+                  ))}
                 </select>
               </div>
-            </div> */}
-            <div class="input-box">
+            </div>
+            {/* <div class="input-box">
               <label htmlFor="machineLocation"> Vị Trí Máy</label>
               <input
                 type="text"
@@ -130,7 +147,7 @@ const MaintenanceForm = () => {
                 value={machineLocation}
                 onChange={(e) => setMachineLocation(e.target.value)}
               />
-            </div>
+            </div> */}
             <div class="input-box">
               <label htmlFor="fullname">Tên Khách Hàng</label>
               <input

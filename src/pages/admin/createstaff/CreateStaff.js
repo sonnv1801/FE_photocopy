@@ -7,25 +7,26 @@ import ModalHeader from "react-bootstrap/ModalHeader";
 import ModalFooter from "react-bootstrap/ModalFooter";
 import ModalTitle from "react-bootstrap/ModalTitle";
 import Button from "react-bootstrap/Button";
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Form from "react-bootstrap/Form";
 
 import "./style.css";
 
 import Menu from "../menu/Menu";
 import {
-  addTypeMaintenances,
-  deleteTypeMaintenances,
-  gettypeMaintenances,
-} from "../../../redux/actions/typeMaintenance.action";
-
-function TypeMaintenanceSupplies() {
+  deleteUsers,
+  getAllStaffs,
+  RegisterUsers,
+} from "../../../redux/actions/user.action";
+function CreateStaff() {
   const [showadd, setShowadd] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("token"));
-  const [name, setName] = useState("");
-  const [seri, setSeri] = useState("");
-  const [note, setNote] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("1");
   const isLoading = useSelector((state) => state.defaultReducer.isLoading);
 
   const dispatch = useDispatch();
@@ -34,25 +35,40 @@ function TypeMaintenanceSupplies() {
     setShowadd(false);
   };
 
-  const listTypeMaintenances = useSelector(
-    (state) => state.defaultReducer.listTypeMaintenance
-  );
-
-  console.log(listTypeMaintenances, "listTypeMaintenances");
-
+  const listAccounts = useSelector((state) => state.defaultReducer.listAccount);
   useEffect(() => {
-    dispatch(gettypeMaintenances());
+    dispatch(getAllStaffs());
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newType = {
-      name: name,
-      seri: seri,
-      note: note,
-    };
-    dispatch(addTypeMaintenances(newType, currentUser?.accessToken));
-    setShowadd(false);
+
+    if (fullname.length === 0 || username.length < 6 || password.length < 6) {
+      if (fullname.length === 0) {
+        toast.warning("Vui lòng nhập đầy đủ tên", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      }
+      if (username.length < 6) {
+        toast.warning("Tên người dùng phải có ít nhất 6 ký tự", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      }
+      if (password.length < 6) {
+        toast.warning("Mật khẩu phải có ít nhất 6 ký tự", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      }
+    } else {
+      const newAccount = {
+        fullname: fullname,
+        username: username,
+        password: password,
+        role: role,
+      };
+      dispatch(RegisterUsers(newAccount, currentUser?.accessToken));
+      setShowadd(false);
+    }
   };
 
   return (
@@ -65,7 +81,7 @@ function TypeMaintenanceSupplies() {
           <div className="title-list">
             <div className="row">
               <div className="col-sm-5">
-                <p>Linh Kiện Máy</p>
+                <p>Thêm Nhân Viên</p>
               </div>
               <div className="col-sm-7">
                 <button
@@ -76,7 +92,7 @@ function TypeMaintenanceSupplies() {
                   }}
                 >
                   <i className="bx bxs-folder-plus"></i>
-                  <span>Thêm Linh Kiện</span>
+                  <span>Thêm Nhân Viên</span>
                 </button>
               </div>
             </div>
@@ -86,9 +102,8 @@ function TypeMaintenanceSupplies() {
               <thead>
                 <tr>
                   <th>STT</th>
-                  <th>Tên Linh Kiện</th>
-                  <th>Mã Seri</th>
-                  <th>Ghi Chú</th>
+                  <th>Tên Nhân Viên</th>
+                  <th>Tài Khoản</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -103,19 +118,18 @@ function TypeMaintenanceSupplies() {
                   </div>
                 ) : (
                   <>
-                    {listTypeMaintenances?.map((item, index) => (
+                    {listAccounts?.map((item, index) => (
                       <>
                         <tr>
                           <td>{index + 1}</td>
-                          <td>{item.name}</td>
-                          <td>{item.seri}</td>
-                          <td>{item.note}</td>
+                          <td>{item.fullname}</td>
+                          <td>{item.username}</td>
                           <td>
                             <button
                               className="btn btn-danger"
                               onClick={() => {
                                 dispatch(
-                                  deleteTypeMaintenances(
+                                  deleteUsers(
                                     item._id,
                                     currentUser?.accessToken
                                   )
@@ -138,27 +152,30 @@ function TypeMaintenanceSupplies() {
 
       <Modal show={showadd} onHide={handleCloseAdd} className="modal">
         <ModalHeader>
-          <ModalTitle>Thêm Mới Linh Kiện</ModalTitle>
+          <ModalTitle>Thêm Mới Nhân Viên</ModalTitle>
         </ModalHeader>
         <ModalBody className="modal-body">
           <Form.Group className="formgroup-body">
-            <Form.Label>Tên Linh Kiện: </Form.Label>
+            <Form.Label>Tên Nhân Viên: </Form.Label>
             <Form.Control
               type="text"
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nhập Loại..."
+              // onChange={handleChange('name')}
+              onChange={(e) => setFullname(e.target.value)}
+              placeholder="Nhập Tên Nhân Viên..."
             />
-            <Form.Label>Mã Seri: </Form.Label>
+            <Form.Label>Tài Khoản: </Form.Label>
             <Form.Control
               type="text"
-              onChange={(e) => setSeri(e.target.value)}
-              placeholder="Nhập mã seri..."
+              // onChange={handleChange('name')}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Nhập Tài Khoản Đăng Nhập..."
             />
-            <Form.Label>Ghi Chú: </Form.Label>
+            <Form.Label>Mật Khẩu: </Form.Label>
             <Form.Control
               type="text"
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Nhập ghi chú..."
+              // onChange={handleChange('name')}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Nhập Mật Khẩu Đăng Nhập..."
             />
           </Form.Group>
         </ModalBody>
@@ -168,7 +185,7 @@ function TypeMaintenanceSupplies() {
             variant="success"
             onClick={handleSubmit}
           >
-            Thêm Loại
+            Tạo Tài Khoản
           </Button>
         </ModalFooter>
       </Modal>
@@ -176,4 +193,4 @@ function TypeMaintenanceSupplies() {
   );
 }
 
-export default TypeMaintenanceSupplies;
+export default CreateStaff;

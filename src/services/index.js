@@ -1,4 +1,6 @@
 import { ComBoService } from "./comboService";
+import { MachineCodeService } from "./machineCodeService";
+import { MachineLocationService } from "./machineLocationService";
 import { OrderService } from "./orderService";
 import { ProductService } from "./productService";
 import { ProductSupplierService } from "./productSupplierService";
@@ -17,3 +19,5 @@ export const supplierService = new SupplierService();
 export const productSupplierService = new ProductSupplierService();
 export const ordersService = new OrderService();
 export const typeMaintenanceService = new TypeMaintenanceService();
+export const machineCodeService = new MachineCodeService();
+export const machineLocationService = new MachineLocationService();

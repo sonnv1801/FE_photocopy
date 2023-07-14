@@ -1,5 +1,5 @@
 import Axios from "axios";
-const API = "https://photocopy.onrender.com/v1/maintenancesupplies";
+const API = "http://localhost:8000/v1/maintenancesupplies";
 
 export class TypeMaintenanceService {
   getAllTypeMaintenance() {

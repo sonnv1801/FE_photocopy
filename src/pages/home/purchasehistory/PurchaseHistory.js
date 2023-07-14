@@ -28,7 +28,7 @@ const PurchaseHistory = ({ customerId }) => {
       try {
         const user = JSON.parse(localStorage.getItem("token"));
         const response = await axios.get(
-          `https://photocopy.onrender.com/v1/ordercombo/${user?._id}`
+          `http://localhost:8000/v1/ordercombo/${user?._id}`
         );
         setOrders(response.data);
         calculateTotalOrderPrice(response.data); // Call the function to calculate the total order price

@@ -7,9 +7,12 @@ import "react-toastify/dist/ReactToastify.css";
 const MaintenanceByStaffPage = () => {
   const [maintenanceList, setMaintenanceList] = useState([]);
   const staffId = JSON.parse(localStorage.getItem("token")); // ID của nhân viên
-  const [repairNote, setRepairNote] = useState("");
-  const [replacedSupplies, setReplacedSupplies] = useState("");
-  const [totalCost, setTotalCost] = useState("");
+
+  const [selectedSuppliesInfo, setSelectedSuppliesInfo] = useState(null);
+  const [selectedSuppliesId, setSelectedSuppliesId] = useState("");
+  const [selectedMaintenanceId, setSelectedMaintenanceId] = useState("");
+  const [inputValues, setInputValues] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchMaintenanceListByStaff();
@@ -18,7 +21,7 @@ const MaintenanceByStaffPage = () => {
   const fetchMaintenanceListByStaff = async () => {
     try {
       const response = await axios.get(
-        `https://photocopy.onrender.com/v1/maintenance/staff/${staffId?._id}`
+        `http://localhost:8000/v1/maintenance/staff/${staffId?._id}`
       );
       setMaintenanceList(response.data);
     } catch (error) {
@@ -27,36 +30,59 @@ const MaintenanceByStaffPage = () => {
   };
 
   const handleRepairFinished = async (maintenanceId) => {
-    if (repairNote === "" || replacedSupplies === "" || totalCost === "") {
+    const maintenanceInput = inputValues[maintenanceId];
+    if (
+      !maintenanceInput ||
+      maintenanceInput.repairNote === "" ||
+      maintenanceInput.replacedSupplies === "" ||
+      maintenanceInput.totalCost === ""
+    ) {
       toast.warning("Nhập Đầy Đủ Thông Tin Đã Sửa Máy");
       return;
     }
 
     try {
-      const response = await axios.put(
-        `https://photocopy.onrender.com/v1/maintenance/staff/repairfinished/${maintenanceId}`,
+      await axios.put(
+        `http://localhost:8000/v1/maintenance/staff/repairfinished/${maintenanceId}`,
         {
           repairStatus: "completed",
-          repairNote: repairNote,
-          replacedSupplies: replacedSupplies,
-          totalCost: totalCost,
+          repairNote: maintenanceInput.repairNote,
+          replacedSupplies: maintenanceInput.replacedSupplies,
+          totalCost: maintenanceInput.totalCost,
         }
       );
 
       const updatedMaintenanceList = maintenanceList.map((maintenance) => {
         if (maintenance._id === maintenanceId) {
-          return response.data;
+          return {
+            ...maintenance,
+            repairStatus: "completed",
+            repairNote: maintenanceInput.repairNote,
+            replacedSupplies: maintenanceInput.replacedSupplies,
+            totalCost: maintenanceInput.totalCost,
+          };
         }
         return maintenance;
       });
       setMaintenanceList(updatedMaintenanceList);
 
-      setRepairNote("");
-      setReplacedSupplies("");
-      setTotalCost("");
       toast.success("Đã Cập Nhập Thành Công!");
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const fetchSuppliesInfo = async (suppliesId) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        `http://localhost:8000/v1/maintenancesupplies/${suppliesId}`
+      );
+      setSelectedSuppliesInfo(response.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -78,9 +104,9 @@ const MaintenanceByStaffPage = () => {
               <th>Địa Chỉ</th>
               <th>Ghi Chú Của Khách</th>
               <th>Trạng Thái Sửa Máy</th>
-              <th>Vật Tư Được Cấp</th>
+              <th>Linh Kiện Được Cấp</th>
               <th>Ghi Chú Sửa Chữa</th>
-              <th>Vật Tư Đã Thay</th>
+              <th>Đã Thay Những Gì</th>
               <th>Tổng Tiền</th>
               <th>Hành Động</th>
             </tr>
@@ -101,14 +127,44 @@ const MaintenanceByStaffPage = () => {
                     ? "Chưa giải quyết..."
                     : "Hoàn Thành!"}
                 </td>
-                <td>{maintenance.supplies}</td>
+                <td>
+                  <button
+                    className="btn btn-success"
+                    disabled={isLoading}
+                    onClick={() => {
+                      setSelectedMaintenanceId(maintenance._id);
+                      setSelectedSuppliesId(maintenance.supplies);
+                      fetchSuppliesInfo(maintenance.supplies);
+                    }}
+                  >
+                    {isLoading ? "Vui Lòng Đợi..." : "Thông Tin Linh Kiện"}
+                  </button>
+                  {selectedSuppliesInfo &&
+                    selectedSuppliesId === maintenance.supplies && (
+                      <ul style={{ listStyleType: "auto", padding: "0 1rem" }}>
+                        <li>Tên Vật Tư: {selectedSuppliesInfo.name}</li>
+                        <li>Mã Seri: {selectedSuppliesInfo.seri}</li>
+                        <li>
+                          Những Linh Kiện Gồm: {selectedSuppliesInfo.note}
+                        </li>
+                      </ul>
+                    )}
+                </td>
                 <td>
                   {maintenance.repairStatus === "pending" ? (
                     <input
                       type="text"
                       placeholder="Nhập đã sửa những gì..."
-                      value={repairNote}
-                      onChange={(e) => setRepairNote(e.target.value)}
+                      value={inputValues[maintenance._id]?.repairNote || ""}
+                      onChange={(e) => {
+                        setInputValues((prevValues) => ({
+                          ...prevValues,
+                          [maintenance._id]: {
+                            ...prevValues[maintenance._id],
+                            repairNote: e.target.value,
+                          },
+                        }));
+                      }}
                       className="repair-input"
                     />
                   ) : (
@@ -120,8 +176,18 @@ const MaintenanceByStaffPage = () => {
                     <input
                       type="text"
                       placeholder="Vật tư đã thay..."
-                      value={replacedSupplies}
-                      onChange={(e) => setReplacedSupplies(e.target.value)}
+                      value={
+                        inputValues[maintenance._id]?.replacedSupplies || ""
+                      }
+                      onChange={(e) => {
+                        setInputValues((prevValues) => ({
+                          ...prevValues,
+                          [maintenance._id]: {
+                            ...prevValues[maintenance._id],
+                            replacedSupplies: e.target.value,
+                          },
+                        }));
+                      }}
                       className="repair-input"
                     />
                   ) : (
@@ -133,14 +199,23 @@ const MaintenanceByStaffPage = () => {
                     <input
                       type="number"
                       placeholder="Tổng Tiền..."
-                      value={totalCost}
-                      onChange={(e) => setTotalCost(e.target.value)}
+                      value={inputValues[maintenance._id]?.totalCost || ""}
+                      onChange={(e) => {
+                        setInputValues((prevValues) => ({
+                          ...prevValues,
+                          [maintenance._id]: {
+                            ...prevValues[maintenance._id],
+                            totalCost: e.target.value,
+                          },
+                        }));
+                      }}
                       className="repair-input"
                     />
                   ) : (
                     "Đã Xong!"
                   )}
                 </td>
+
                 <td>
                   {maintenance.repairStatus === "pending" ? (
                     <button

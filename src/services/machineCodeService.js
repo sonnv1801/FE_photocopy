@@ -1,16 +1,16 @@
 import Axios from "axios";
-const API = "http://localhost:8000/v1/type";
+const API = "http://localhost:8000/v1/machinecode";
 
-export class TypeService {
-  getAllType() {
+export class MachineCodeService {
+  getAllCode() {
     return Axios.get(`${API}`);
   }
-  addType(type, accessToken) {
-    return Axios.post(API, type, {
+  addCode(code, accessToken) {
+    return Axios.post(API, code, {
       headers: { token: `vanson ${accessToken}` },
     });
   }
-  deleteType(id, accessToken) {
+  deleteCode(id, accessToken) {
     return Axios.delete(`${API}/${id}`, {
       headers: { token: `vanson ${accessToken}` },
     });

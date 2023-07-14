@@ -318,7 +318,7 @@ export const CardHorizontal = (cart) => {
           // Giảm số lượng combo
           for (const combo of order.combos) {
             const comboResponse = await axios.put(
-              `https://photocopy.onrender.com/v1/combo/combo/${combo._id}/reduce`,
+              `http://localhost:8000/v1/combo/combo/${combo._id}/reduce`,
               {
                 quantityCombo: combo.quantityCombo,
                 products: combo.products.map((product) => ({
@@ -337,7 +337,7 @@ export const CardHorizontal = (cart) => {
           // Tăng số lượng sản phẩm đã mua
           for (const product of order.products) {
             const productResponse = await axios.post(
-              `https://photocopy.onrender.com/v1/order/products/buy/${product.id}`,
+              `http://localhost:8000/v1/order/products/buy/${product.id}`,
               {
                 quantity: product.quantity_cart,
               }
@@ -351,7 +351,7 @@ export const CardHorizontal = (cart) => {
 
           // Gửi yêu cầu POST đến backend server với đơn hàng đã được map
           const response = await axios.post(
-            "https://photocopy.onrender.com/v1/ordercombo",
+            "http://localhost:8000/v1/ordercombo",
             order
           );
 

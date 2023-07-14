@@ -1,5 +1,8 @@
 import {
+  ADD_ACCOUNT,
   ADD_CART,
+  ADD_CODES,
+  ADD_LOCATIONS,
   ADD_PRODUCT,
   ADD_PRODUCT_SUPPLIER,
   ADD_TYPES,
@@ -7,6 +10,8 @@ import {
   ADD_TYPES_MAINTENANCE,
   ADD_TYPES_SUPPLIER,
   DELETE_CART,
+  DELETE_CODES,
+  DELETE_LOCATIONS,
   DELETE_PRODUCT,
   DELETE_PRODUCT_SUPPLIER,
   DELETE_PRODUCT_TO_ORDERS,
@@ -14,10 +19,14 @@ import {
   DELETE_TYPES_COMBO,
   DELETE_TYPES_MAINTENANCE,
   DELETE_TYPES_SUPPLIER,
+  DELETE_USER_STAFF,
+  FETCH_ALL_STAFF,
+  FETCH_CODE,
   FETCH_COMBO_BY_LINK,
   FETCH_DETAIL,
   FETCH_DETAIL_COMBO,
   FETCH_DETAIL_SUPPLIER,
+  FETCH_LOCATION,
   FETCH_PRODUCTS,
   FETCH_PRODUCTS_COMBOS,
   FETCH_PRODUCTS_TO_ORDERS,
@@ -48,6 +57,9 @@ const initialState = {
     error: false,
   },
   listType: [],
+  listCode: [],
+  listLocation: [],
+  listAccount: [],
   listTypeMaintenance: [],
   listSupplier: [],
   listTypeComBo: [],
@@ -94,6 +106,21 @@ const defaultReducer = (state = initialState, action) => {
     }
     case FETCH_TYPE_PRODUCT: {
       state.listType = payload;
+      return { ...state }; //setState
+    }
+
+    case FETCH_CODE: {
+      state.listCode = payload;
+      return { ...state }; //setState
+    }
+
+    case FETCH_LOCATION: {
+      state.listLocation = payload;
+      return { ...state }; //setState
+    }
+
+    case FETCH_ALL_STAFF: {
+      state.listAccount = payload;
       return { ...state }; //setState
     }
 
@@ -205,6 +232,26 @@ const defaultReducer = (state = initialState, action) => {
       return { ...state };
     }
 
+    case ADD_CODES: {
+      let updateList = [...state.listCode];
+      updateList.push(payload);
+      state.listCode = updateList;
+      return { ...state };
+    }
+    case ADD_LOCATIONS: {
+      let updateList = [...state.listLocation];
+      updateList.push(payload);
+      state.listLocation = updateList;
+      return { ...state };
+    }
+
+    case ADD_ACCOUNT: {
+      let updateList = [...state.listAccount];
+      updateList.push(payload);
+      state.listAccount = updateList;
+      return { ...state };
+    }
+
     case ADD_TYPES_MAINTENANCE: {
       let updateList = [...state.listTypeMaintenance];
       updateList.push(payload);
@@ -217,6 +264,38 @@ const defaultReducer = (state = initialState, action) => {
       if (index === -1) {
         updateList.splice(payload, index);
         state.listType = updateList;
+      }
+
+      return { ...state };
+    }
+
+    case DELETE_CODES: {
+      let updateList = [...state.listCode];
+      let index = updateList.findIndex((type) => type.id === action.id);
+      if (index === -1) {
+        updateList.splice(payload, index);
+        state.listCode = updateList;
+      }
+
+      return { ...state };
+    }
+
+    case DELETE_LOCATIONS: {
+      let updateList = [...state.listLocation];
+      let index = updateList.findIndex((type) => type.id === action.id);
+      if (index === -1) {
+        updateList.splice(payload, index);
+        state.listLocation = updateList;
+      }
+
+      return { ...state };
+    }
+    case DELETE_USER_STAFF: {
+      let updateList = [...state.listAccount];
+      let index = updateList.findIndex((type) => type.id === action.id);
+      if (index === -1) {
+        updateList.splice(payload, index);
+        state.listAccount = updateList;
       }
 
       return { ...state };

@@ -38,6 +38,9 @@ import MaintenanceList from "./pages/home/maintenancelist/MaintenanceList";
 import AdminMaintenanceList from "./pages/admin/adminmaintenancelist/AdminMaintenanceList";
 import MaintenanceByStaffPage from "./pages/admin/maintenancebystaffpage/MaintenanceByStaffPage";
 import TypeMaintenanceSupplies from "./pages/admin/typemaintenancesupplies/TypeMaintenanceSupplies";
+import CreateStaff from "./pages/admin/createstaff/CreateStaff";
+import MachineCodeAdmin from "./pages/admin/machinecodeadmin/MachineCodeAdmin";
+import MachineLocationAdmin from "./pages/admin/machinelocationadmin/MachineLocationAdmin";
 function App() {
   const user = JSON.parse(localStorage.getItem("token"));
   return (
@@ -98,9 +101,18 @@ function App() {
           {user?.role === "0" ? (
             <>
               <Route
+                path="/admin-list-machinecode"
+                element={<MachineCodeAdmin />}
+              />
+              <Route
+                path="/admin-list-machinelocation"
+                element={<MachineLocationAdmin />}
+              />
+              <Route
                 path="/admin-maintenance-list"
                 element={<AdminMaintenanceList />}
               />
+              <Route path="/admin-create-staff" element={<CreateStaff />} />
               <Route path="/cart-supplier" element={<CartPage />} />
               <Route
                 path="/admin-list-maintenanceSupplies"
