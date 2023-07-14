@@ -13,7 +13,7 @@ const FooterPolicy = () => {
         </li>
         <li>
           <Link to="/" className="text-dark">
-            Phụ tùng combo
+            Máy PhoToCopy combo
           </Link>
         </li>
         <li>

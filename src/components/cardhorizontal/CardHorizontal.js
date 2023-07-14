@@ -631,7 +631,7 @@ export const CardHorizontal = (cart) => {
               <div className="col-xl-6 col-sm-12"></div>
               <div className="col-xl-6 col-sm-12">
                 <div className="sub-total">
-                  <p>Tạm tính Tiền Phụ Tùng: </p>
+                  <p>Tạm tính Tiền Máy PhoToCopy: </p>
                   <b>{`${numeral(totalAmountCarts).format("0,0")}đ`}</b>
                 </div>
                 <div className="sub-total">

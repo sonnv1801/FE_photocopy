@@ -232,7 +232,7 @@ export const NavBarMobile = ({
                         aria-expanded="false"
                         style={{ color: "black" }}
                       >
-                        Quản Lý Phụ Tùng
+                        Quản Lý Máy PhoToCopy
                       </p>
                       <ul className="dropdown-menu">
                         <li>
@@ -241,7 +241,7 @@ export const NavBarMobile = ({
                             className="dropdown-item"
                             onClick={refreshPage}
                           >
-                            Loại Phụ Tùng
+                            Loại Máy PhoToCopy
                           </Link>
                         </li>
                         <li>
@@ -250,7 +250,7 @@ export const NavBarMobile = ({
                             className="dropdown-item"
                             onClick={refreshPage}
                           >
-                            Sản Phẩm Phụ Tùng
+                            Sản Phẩm Máy PhoToCopy
                           </Link>
                         </li>
                       </ul>
@@ -305,7 +305,7 @@ export const NavBarMobile = ({
                             className="dropdown-item"
                             onClick={refreshPage}
                           >
-                            Đơn Hàng Của Phụ Tùng & Combo
+                            Đơn Hàng Của Máy PhoToCopy & Combo
                           </Link>
                         </li>
                       </ul>

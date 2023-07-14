@@ -66,7 +66,7 @@ export default function Menu() {
           <ListItemIcon>
             <AgricultureIcon />
           </ListItemIcon>
-          <ListItemText primary="Quản Lý Phụ Tùng" />
+          <ListItemText primary="Quản Lý Máy PhoToCopy" />
           {open["phu-tung"] ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={open["phu-tung"]} timeout="auto" unmountOnExit>
@@ -76,7 +76,7 @@ export default function Menu() {
                 <ListItemIcon>
                   <AnimationIcon />
                 </ListItemIcon>
-                <ListItemText primary="Loại Phụ Tùng" />
+                <ListItemText primary="Loại Máy PhoToCopy" />
               </ListItemButton>
             </Link>
             <Link to="/list-products-admin">
@@ -84,7 +84,7 @@ export default function Menu() {
                 <ListItemIcon>
                   <DnsIcon />
                 </ListItemIcon>
-                <ListItemText primary="Sản Phẩm Phụ Tùng" />
+                <ListItemText primary="Sản Phẩm Máy PhoToCopy" />
               </ListItemButton>
             </Link>
           </List>
@@ -130,7 +130,7 @@ export default function Menu() {
                 <ListItemIcon>
                   <AddTaskIcon />
                 </ListItemIcon>
-                <ListItemText primary="Đơn Hàng Của Phụ Tùng & Combo" />
+                <ListItemText primary="Đơn Hàng Của Máy PhoToCopy & Combo" />
               </ListItemButton>
             </Link>
           </List>

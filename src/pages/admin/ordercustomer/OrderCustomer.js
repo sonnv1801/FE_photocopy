@@ -61,7 +61,7 @@ export const OrderCustomer = () => {
               <h2 style={{ fontSize: "15px", color: "green" }}>
                 Mã Đơn Hàng: {order._id}
               </h2>
-              <h3 style={{ margin: "1rem 0" }}>Sản phẩm phụ tùng:</h3>
+              <h3 style={{ margin: "1rem 0" }}>Sản phẩm Máy PhoToCopy:</h3>
 
               <div class="table_responsive">
                 <table>

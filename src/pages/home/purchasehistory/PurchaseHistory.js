@@ -253,7 +253,7 @@ const PurchaseHistory = ({ customerId }) => {
           <div className="body-history">
             <div className="sub-body-history">
               <div className="title-history">
-                <h2>Các đơn Phụ tùng</h2>
+                <h2>Các đơn Máy PhoToCopy</h2>
                 <Button
                   variant="contained"
                   onClick={() => handlePrintInvoice(orders, totalOrderPrice)}

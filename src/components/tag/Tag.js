@@ -4,7 +4,7 @@ export const Tag = () => {
   return (
     <div className="tag sm-tag">
       <div className="body-tag">
-        <span>Phụ tùng</span>
+        <span>Máy PhoToCopy</span>
       </div>
     </div>
   );

@@ -41,7 +41,7 @@ function ListProductAdmin() {
           <div className="title-list">
             <div className="row">
               <div className="col-sm-5">
-                <p>Quản lý Phụ Tùng</p>
+                <p>Quản lý Máy PhoToCopy</p>
               </div>
             </div>
           </div>
