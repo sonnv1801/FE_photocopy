@@ -31,7 +31,9 @@ const AdminMaintenanceList = () => {
 
   const fetchMaintenanceList = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/v1/maintenance");
+      const response = await axios.get(
+        "https://photocopy.onrender.com/v1/maintenance"
+      );
       setMaintenanceList(response.data);
     } catch (error) {
       console.error(error);
@@ -42,7 +44,7 @@ const AdminMaintenanceList = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `http://localhost:8000/v1/maintenancesupplies/${suppliesId}`
+        `https://photocopy.onrender.com/v1/maintenancesupplies/${suppliesId}`
       );
       setSelectedSuppliesInfo(response.data);
     } catch (error) {
@@ -54,7 +56,9 @@ const AdminMaintenanceList = () => {
 
   const fetchStaffOptions = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/v1/user");
+      const response = await axios.get(
+        "https://photocopy.onrender.com/v1/user"
+      );
       const filteredOptions = response.data.filter((user) => user.role === "1");
       setStaffOptions(filteredOptions);
     } catch (error) {
@@ -65,7 +69,7 @@ const AdminMaintenanceList = () => {
   const fetchSuppliesOptions = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/v1/maintenanceSupplies"
+        "https://photocopy.onrender.com/v1/maintenanceSupplies"
       );
       setSuppliesOptions(response.data);
     } catch (error) {
@@ -86,7 +90,7 @@ const AdminMaintenanceList = () => {
       };
 
       const response = await axios.put(
-        `http://localhost:8000/v1/maintenance/${maintenanceId}`,
+        `https://photocopy.onrender.com/v1/maintenance/${maintenanceId}`,
         maintenanceToUpdate
       );
       console.log(response.data);
@@ -129,7 +133,9 @@ const AdminMaintenanceList = () => {
 
   const handleDeleteMaintenance = async (maintenance) => {
     try {
-      await axios.delete(`http://localhost:8000/v1/maintenance/${maintenance}`);
+      await axios.delete(
+        `https://photocopy.onrender.com/v1/maintenance/${maintenance}`
+      );
 
       fetchMaintenanceList();
 

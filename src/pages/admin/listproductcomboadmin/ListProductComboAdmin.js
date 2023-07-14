@@ -184,7 +184,7 @@ function ListProductComboAdmin() {
 
     try {
       const comboResponse = await axios.post(
-        "http://localhost:8000/v1/combo/create",
+        "https://photocopy.onrender.com/v1/combo/create",
         comboFormData,
         {
           headers: {
@@ -232,7 +232,9 @@ function ListProductComboAdmin() {
 
   const fetchCombos = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/v1/combo");
+      const response = await axios.get(
+        "https://photocopy.onrender.com/v1/combo"
+      );
       setCombos(response.data);
     } catch (error) {
       console.error("Error fetching combos:", error);
@@ -241,7 +243,7 @@ function ListProductComboAdmin() {
 
   const handleDeleteCombo = async (comboId) => {
     try {
-      await axios.delete(`http://localhost:8000/v1/combo/${comboId}`);
+      await axios.delete(`https://photocopy.onrender.com/v1/combo/${comboId}`);
 
       fetchCombos();
 

@@ -167,7 +167,7 @@ function ListProductSupplier() {
           });
 
           const response = await axios.post(
-            "http://localhost:8000/v1/productsupplier/addmanyproduct",
+            "https://photocopy.onrender.com/v1/productsupplier/addmanyproduct",
             newData
           );
 

@@ -21,7 +21,7 @@ const MaintenanceByStaffPage = () => {
   const fetchMaintenanceListByStaff = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/v1/maintenance/staff/${staffId?._id}`
+        `https://photocopy.onrender.com/v1/maintenance/staff/${staffId?._id}`
       );
       setMaintenanceList(response.data);
     } catch (error) {
@@ -43,7 +43,7 @@ const MaintenanceByStaffPage = () => {
 
     try {
       await axios.put(
-        `http://localhost:8000/v1/maintenance/staff/repairfinished/${maintenanceId}`,
+        `https://photocopy.onrender.com/v1/maintenance/staff/repairfinished/${maintenanceId}`,
         {
           repairStatus: "completed",
           repairNote: maintenanceInput.repairNote,
@@ -76,7 +76,7 @@ const MaintenanceByStaffPage = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `http://localhost:8000/v1/maintenancesupplies/${suppliesId}`
+        `https://photocopy.onrender.com/v1/maintenancesupplies/${suppliesId}`
       );
       setSelectedSuppliesInfo(response.data);
     } catch (error) {

@@ -1,5 +1,5 @@
 import Axios from "axios";
-const API = "http://localhost:8000/v1/machinelocation";
+const API = "https://photocopy.onrender.com/v1/machinelocation";
 
 export class MachineLocationService {
   getAllLocation() {

@@ -1,6 +1,6 @@
 import Axios from "axios";
-const API = "http://localhost:8000/v1/auth";
-const APISTAFF = "http://localhost:8000/v1/user";
+const API = "https://photocopy.onrender.com/v1/auth";
+const APISTAFF = "https://photocopy.onrender.com/v1/user";
 
 export class UserService {
   Login(user) {

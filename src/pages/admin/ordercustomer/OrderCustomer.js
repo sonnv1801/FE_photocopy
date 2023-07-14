@@ -12,7 +12,9 @@ export const OrderCustomer = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/v1/ordercombo"); // Replace with your actual API endpoint
+      const response = await axios.get(
+        "https://photocopy.onrender.com/v1/ordercombo"
+      ); // Replace with your actual API endpoint
       setOrders(response.data);
     } catch (error) {
       console.log(error);

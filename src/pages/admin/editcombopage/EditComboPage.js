@@ -46,7 +46,7 @@ const EditComboPage = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/v1/combo/${path}`)
+    fetch(`https://photocopy.onrender.com/v1/combo/${path}`)
       .then((res) => res.json())
       .then((data) => setData(data));
   }, []);
@@ -109,7 +109,7 @@ const EditComboPage = () => {
 
   const handleSaveChanges = () => {
     setIsCreatingProduct(true);
-    const url = `http://localhost:8000/v1/combo/combos/${path}`;
+    const url = `https://photocopy.onrender.com/v1/combo/combos/${path}`;
 
     const formData = new FormData();
     formData.append("image", data.image);
@@ -189,7 +189,7 @@ const EditComboPage = () => {
         throw new Error("Vui lòng nhập đầy đủ thông tin sản phẩm");
       }
 
-      const url = `http://localhost:8000/v1/combo/combo/${path}/products`;
+      const url = `https://photocopy.onrender.com/v1/combo/combo/${path}/products`;
 
       const formData = new FormData();
       formData.append("name", newProduct.name);
@@ -241,7 +241,7 @@ const EditComboPage = () => {
 
     axios
       .delete(
-        `http://localhost:8000/v1/combo/combo/${path}/product/${productId}`
+        `https://photocopy.onrender.com/v1/combo/combo/${path}/product/${productId}`
       )
       .then(() => {
         setData((prevData) => {

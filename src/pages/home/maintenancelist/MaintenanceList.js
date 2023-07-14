@@ -14,7 +14,7 @@ const MaintenanceList = () => {
     try {
       const customerData = JSON.parse(localStorage.getItem("token"));
       const response = await axios.get(
-        `http://localhost:8000/v1/maintenance/${customerData?._id}`
+        `https://photocopy.onrender.com/v1/maintenance/${customerData?._id}`
       );
       setMaintenanceList(response.data);
     } catch (error) {

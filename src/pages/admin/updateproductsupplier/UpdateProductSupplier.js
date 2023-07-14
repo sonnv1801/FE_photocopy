@@ -31,7 +31,7 @@ const UpdateProductSupplier = () => {
   const [loading, setLoading] = useState(false); // State cho nút xoay đợi
 
   useEffect(() => {
-    fetch(`http://localhost:8000/v1/productsupplier/${path}`)
+    fetch(`https://photocopy.onrender.com/v1/productsupplier/${path}`)
       .then((res) => res.json())
       .then((data) => setData(data));
   }, []);

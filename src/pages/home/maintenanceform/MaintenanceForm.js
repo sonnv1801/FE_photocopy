@@ -69,13 +69,16 @@ const MaintenanceForm = () => {
 
     try {
       // Tiếp tục xử lý khi các trường đều đã được nhập
-      const response = await fetch("http://localhost:8000/v1/maintenance", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(maintenanceData),
-      });
+      const response = await fetch(
+        "https://photocopy.onrender.com/v1/maintenance",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(maintenanceData),
+        }
+      );
 
       const data = await response.json();
 

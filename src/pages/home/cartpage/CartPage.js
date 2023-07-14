@@ -65,10 +65,13 @@ export const CartPage = () => {
         purchaseType: product.purchaseType, // Thêm purchaseType vào dữ liệu sản phẩm
       }));
 
-      const response = await axios.post("http://localhost:8000/v1/order", {
-        customerId,
-        products,
-      });
+      const response = await axios.post(
+        "https://photocopy.onrender.com/v1/order",
+        {
+          customerId,
+          products,
+        }
+      );
 
       // Xử lý phản hồi từ API sau khi đặt hàng thành công
       console.log(response.data);

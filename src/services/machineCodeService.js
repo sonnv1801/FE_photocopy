@@ -1,5 +1,5 @@
 import Axios from "axios";
-const API = "http://localhost:8000/v1/machinecode";
+const API = "https://photocopy.onrender.com/v1/machinecode";
 
 export class MachineCodeService {
   getAllCode() {

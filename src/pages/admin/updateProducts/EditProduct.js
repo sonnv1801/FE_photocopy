@@ -48,7 +48,7 @@ const EditProduct = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/v1/order/orders/products/${path}`)
+    fetch(`https://photocopy.onrender.com/v1/order/orders/products/${path}`)
       .then((res) => res.json())
       .then((data) => setData(data));
   }, []);
