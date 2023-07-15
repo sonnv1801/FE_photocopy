@@ -93,11 +93,11 @@ const MaintenanceForm = () => {
 
   return (
     <>
-      <section class="container-maintence-customer">
+      <section className="container-maintence-customer">
         <header>Dịch Vụ Bảo Trì</header>
-        <form action="#" class="form" onSubmit={handleSubmit}>
-          <div class="column">
-            <div class="input-box">
+        <form action="#" className="form" onSubmit={handleSubmit}>
+          <div className="column">
+            <div className="input-box">
               <label htmlFor="nameProduct">Tên Máy</label>
               <input
                 type="text"
@@ -107,9 +107,9 @@ const MaintenanceForm = () => {
                 onChange={(e) => setNameProduct(e.target.value)}
               />
             </div>
-            <div class="input-box">
+            <div className="input-box">
               <label htmlFor="machineCode">Mã Máy</label>
-              <div class="select-box">
+              <div className="select-box">
                 <select
                   value={machineCode}
                   onChange={(e) => setMachineCode(e.target.value)}
@@ -125,10 +125,10 @@ const MaintenanceForm = () => {
             </div>
           </div>
 
-          <div class="column">
-            <div class="input-box">
+          <div className="column">
+            <div className="input-box">
               <label htmlFor="machineLocation">Vị Trí Máy</label>
-              <div class="select-box">
+              <div className="select-box">
                 <select
                   value={machineLocation}
                   onChange={(e) => setMachineLocation(e.target.value)}
@@ -142,7 +142,7 @@ const MaintenanceForm = () => {
                 </select>
               </div>
             </div>
-            {/* <div class="input-box">
+            {/* <div className="input-box">
               <label htmlFor="machineLocation"> Vị Trí Máy</label>
               <input
                 type="text"
@@ -151,7 +151,7 @@ const MaintenanceForm = () => {
                 onChange={(e) => setMachineLocation(e.target.value)}
               />
             </div> */}
-            <div class="input-box">
+            <div className="input-box">
               <label htmlFor="fullname">Tên Khách Hàng</label>
               <input
                 type="text"
@@ -163,8 +163,8 @@ const MaintenanceForm = () => {
             </div>
           </div>
 
-          <div class="column">
-            <div class="input-box">
+          <div className="column">
+            <div className="input-box">
               <label htmlFor="phone"> Số Điện Thoại</label>
               <input
                 type="number"
@@ -174,13 +174,13 @@ const MaintenanceForm = () => {
                 required
               />
             </div>
-            <div class="input-box">
+            <div className="input-box">
               <label htmlFor="address">Địa Chỉ</label>
               <input
                 type="text"
                 placeholder="Địa Chỉ Khách Hàng..."
                 id="address"
-                className="maintenance-form-input"
+                classNameName="maintenance-form-input"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 required
@@ -188,20 +188,20 @@ const MaintenanceForm = () => {
             </div>
           </div>
 
-          <div class="input-box address">
+          <div className="input-box address">
             <label htmlFor="note">Ghi Chú Sửa Chữa</label>
             <input
               placeholder="Ghi Chú Máy Hư Gì.."
-              className="maintenance-form-textarea"
+              classNameName="maintenance-form-textarea"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               required
             />
           </div>
           {user === null ? (
-            <div class="row">
+            <div className="row">
               <div
-                class="col-xl-6 col-sm-12"
+                className="col-xl-6 col-sm-12"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -210,7 +210,7 @@ const MaintenanceForm = () => {
               >
                 <p>Bạn Đã Đăng Nhập Chưa?</p>
               </div>
-              <div class="col-xl-6 col-sm-12">
+              <div className="col-xl-6 col-sm-12">
                 <Link to="/login">
                   <button>Đăng Nhập Ngay</button>
                 </Link>

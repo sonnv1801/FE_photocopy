@@ -11,18 +11,15 @@ import moment from "moment";
 
 const AdminMaintenanceList = () => {
   const [maintenanceList, setMaintenanceList] = useState([]);
-  const [selectedStaffId, setSelectedStaffId] = useState("");
-  const [selectedSuppliesId, setSelectedSuppliesId] = useState("");
-  const [staffId, setStaffId] = useState("");
-  const [staffName, setStaffName] = useState("");
-  const [supplies, setSupplies] = useState("");
+  const [selectedMaintenanceId, setSelectedMaintenanceId] = useState("");
+  const [maintenanceData, setMaintenanceData] = useState({});
   const [staffOptions, setStaffOptions] = useState([]);
   const [suppliesOptions, setSuppliesOptions] = useState([]);
-  const [selectedSuppliesInfo, setSelectedSuppliesInfo] = useState(null);
-  const [selectedMaintenanceId, setSelectedMaintenanceId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  console.log(suppliesOptions, "suppliesOptions");
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchNotFound, setSearchNotFound] = useState(false);
+  const [selectedSuppliesInfo, setSelectedSuppliesInfo] = useState(null);
+  const [selectedSuppliesId, setSelectedSuppliesId] = useState("");
   useEffect(() => {
     fetchMaintenanceList();
     fetchStaffOptions();
@@ -37,20 +34,6 @@ const AdminMaintenanceList = () => {
       setMaintenanceList(response.data);
     } catch (error) {
       console.error(error);
-    }
-  };
-
-  const fetchSuppliesInfo = async (suppliesId) => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `https://photocopy.onrender.com/v1/maintenancesupplies/${suppliesId}`
-      );
-      setSelectedSuppliesInfo(response.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -77,16 +60,38 @@ const AdminMaintenanceList = () => {
     }
   };
 
+  const handleSelectMaintenance = (maintenanceId) => {
+    setSelectedMaintenanceId(maintenanceId);
+    const selectedMaintenance = maintenanceList.find(
+      (maintenance) => maintenance._id === maintenanceId
+    );
+    setMaintenanceData(selectedMaintenance);
+  };
+  const handleStaffChange = (e) => {
+    const selectedStaffId = e.target.value;
+    const selectedStaff = staffOptions.find(
+      (staff) => staff._id === selectedStaffId
+    );
+    setMaintenanceData((prevState) => ({
+      ...prevState,
+      staff: selectedStaff ? selectedStaff.fullname : "",
+      staffId: selectedStaffId,
+    }));
+  };
+
+  const handleSuppliesChange = (e) => {
+    const selectedSuppliesId = e.target.value;
+    setMaintenanceData((prevState) => ({
+      ...prevState,
+      supplies: selectedSuppliesId,
+    }));
+  };
   const handleUpdateMaintenance = async (maintenanceId) => {
     try {
-      if (!staffName || !supplies) {
-        toast.warning("Vui lòng chọn đầy đủ thông tin.");
-        return;
-      }
       const maintenanceToUpdate = {
-        staffId,
-        staff: staffName,
-        supplies,
+        staffId: maintenanceData.staffId,
+        staff: maintenanceData.staff,
+        supplies: maintenanceData.supplies,
       };
 
       const response = await axios.put(
@@ -102,35 +107,25 @@ const AdminMaintenanceList = () => {
     }
   };
 
-  const handleStaffChange = (e) => {
-    const selectedStaffId = e.target.value;
-    setSelectedStaffId(selectedStaffId);
-
-    const selectedStaff = staffOptions.find(
-      (staff) => staff._id === selectedStaffId
-    );
-    if (selectedStaff) {
-      setStaffId(selectedStaff._id);
-      setStaffName(selectedStaff.fullname);
-    } else {
-      setStaffId("");
-      setStaffName("");
+  const handleSearch = async () => {
+    try {
+      const response = await axios.post(
+        "https://photocopy.onrender.com/v1/maintenance/search",
+        { keyword: searchKeyword }
+      );
+      if (response.data.length === 0) {
+        toast.info(
+          "Không tìm thấy thông tin dựa trên từ khóa tìm kiếm đã nhập."
+        );
+        setSearchNotFound(true);
+      } else {
+        setSearchNotFound(false);
+        setMaintenanceList(response.data);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
-
-  const handleSuppliesChange = (e) => {
-    const selectedSuppliesId = e.target.value;
-    setSelectedSuppliesId(selectedSuppliesId);
-    const selectedSupplies = suppliesOptions.find(
-      (supplies) => supplies._id === selectedSuppliesId
-    );
-    if (selectedSupplies) {
-      setSupplies(selectedSupplies); // Lưu thông tin vật tư đã chọn
-    } else {
-      setSupplies(null);
-    }
-  };
-
   const handleDeleteMaintenance = async (maintenance) => {
     try {
       await axios.delete(
@@ -146,6 +141,19 @@ const AdminMaintenanceList = () => {
     }
   };
 
+  const fetchSuppliesInfo = async (suppliesId) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        `https://photocopy.onrender.com/v1/maintenancesupplies/${suppliesId}`
+      );
+      setSelectedSuppliesInfo(response.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="admin-maintenance-list-container">
       <h1 className="admin-maintenance-list-title">
@@ -160,8 +168,19 @@ const AdminMaintenanceList = () => {
           </Button>
         </Link>
       </h1>
+      <div className="search-container">
+        <input
+          type="text"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          placeholder="Nhập từ khóa tìm kiếm (VD: Tên Sản Phẩm, Mã Máy, Vị Trí Máy & Tên Khách Hàng)"
+        />
+        <button className="btn btn-success" onClick={handleSearch}>
+          Tìm kiếm
+        </button>
+      </div>
 
-      <div class="table_responsive">
+      <div className="table_responsive">
         <table>
           <thead>
             <tr>
@@ -236,49 +255,45 @@ const AdminMaintenanceList = () => {
                 <td>
                   <ul style={{ listStyleType: "auto", padding: "0 1rem" }}>
                     {maintenance.repairHistory.map((history, index) => (
-                      <>
-                        <li key={index}>Đã Sửa: {history.repairNote},</li>
+                      <React.Fragment key={index}>
+                        <li>Đã Sửa: {history.repairNote}</li>
+                        <li>Vật Tư Đã Thay: {history.replacedSupplies}</li>
                         <li>
-                          Vật Tư Đã Thay:
-                          {history.replacedSupplies},
-                        </li>
-                        <li>
-                          Tổng Tiền:
+                          Tổng Tiền:{" "}
                           {`${numeral(history.totalCost).format("0,0")}đ`}
                         </li>
                         <li>
-                          Hoàn Thành Vào Lúc:
-                          <br />
+                          Hoàn Thành Vào Lúc: <br />
                           {moment(history.repairTime).format(
                             "HH:mm:ss DD-MM-YYYY"
                           )}
                         </li>
-                      </>
+                      </React.Fragment>
                     ))}
                   </ul>
                 </td>
                 <td>
                   <div className="admin-maintenance-action">
-                    <label>
-                      Nhân Viên Tiếp Nhận:
-                      <select
-                        value={selectedStaffId}
-                        onChange={handleStaffChange}
-                      >
-                        <option value="">Chọn Nhân Viên</option>
-                        {staffOptions.map((staff) => (
-                          <option key={staff._id} value={staff._id}>
-                            {staff.fullname}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    {selectedStaffId !== "" && (
+                    {selectedMaintenanceId === maintenance._id && (
                       <>
+                        <label>
+                          Nhân Viên Tiếp Nhận:
+                          <select
+                            value={maintenanceData.staffId || ""}
+                            onChange={handleStaffChange}
+                          >
+                            <option value="">Chọn Nhân Viên</option>
+                            {staffOptions.map((staff) => (
+                              <option key={staff._id} value={staff._id}>
+                                {staff.fullname}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
                         <label>
                           Vật Tư Cấp Cho Nhân Viên:
                           <select
-                            value={selectedSuppliesId}
+                            value={maintenanceData.supplies || ""}
                             onChange={handleSuppliesChange}
                           >
                             <option value="">Chọn Vật Tư</option>
@@ -299,13 +314,19 @@ const AdminMaintenanceList = () => {
                         </button>
                       </>
                     )}
+                    <button
+                      className="btn btn-success"
+                      onClick={() => handleSelectMaintenance(maintenance._id)}
+                    >
+                      Chọn Nhân Viên & Linh Kiện
+                    </button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDeleteMaintenance(maintenance._id)}
+                    >
+                      Xóa
+                    </button>
                   </div>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleDeleteMaintenance(maintenance._id)}
-                  >
-                    Xóa
-                  </button>
                 </td>
               </tr>
             ))}

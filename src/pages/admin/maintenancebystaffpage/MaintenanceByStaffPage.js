@@ -13,10 +13,32 @@ const MaintenanceByStaffPage = () => {
   const [selectedMaintenanceId, setSelectedMaintenanceId] = useState("");
   const [inputValues, setInputValues] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchNotFound, setSearchNotFound] = useState(false);
 
   useEffect(() => {
     fetchMaintenanceListByStaff();
   }, []);
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.post(
+        "https://photocopy.onrender.com/v1/maintenance/search",
+        { keyword: searchKeyword }
+      );
+      if (response.data.length === 0) {
+        toast.info(
+          "Không tìm thấy thông tin dựa trên từ khóa tìm kiếm đã nhập."
+        );
+        setSearchNotFound(true);
+      } else {
+        setSearchNotFound(false);
+        setMaintenanceList(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchMaintenanceListByStaff = async () => {
     try {
@@ -91,6 +113,17 @@ const MaintenanceByStaffPage = () => {
       <h1 className="maintenance-page-title">
         Danh Sách Bảo Trì Của Nhân Viên
       </h1>
+      <div className="search-container">
+        <input
+          type="text"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          placeholder="Nhập từ khóa tìm kiếm (VD: Tên Sản Phẩm, Mã Máy, Vị Trí Máy & Tên Khách Hàng)"
+        />
+        <button className="btn btn-success" onClick={handleSearch}>
+          Tìm kiếm
+        </button>
+      </div>
       <div class="table_responsive">
         <table>
           <thead>

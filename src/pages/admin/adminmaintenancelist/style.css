@@ -81,3 +81,17 @@
 .admin-maintenance-list-container::-webkit-scrollbar-thumb:hover {
   background-color: #555;
 }
+
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-container input {
+  border: 1px solid darkgray;
+  padding: 0.4rem;
+  width: 50%;
+  border-radius: 0.4rem;
+  outline: gray;
+}
